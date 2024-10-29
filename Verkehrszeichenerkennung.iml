@@ -7,15 +7,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/OneDrive - Hochschule Zittau Görlitz/Dokumente/HSZG-WindowsPC/1.Semester/Maschinelles Lernen/opencv/build/java/opencv-4100.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../_opencv/opencv/build/java/opencv-4100.jar!/" />
         </CLASSES>
         <JAVADOC />
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/../../_opencv/opencv/build/java/x64" />
+        </NATIVE>
         <SOURCES>
-          <root url="jar://$USER_HOME$/OneDrive - Hochschule Zittau Görlitz/Dokumente/HSZG-WindowsPC/1.Semester/Maschinelles Lernen/opencv/build/java/opencv-4100.jar!/" />
-          <root url="jar://$USER_HOME$/OneDrive - Hochschule Zittau Görlitz/Dokumente/HSZG-WindowsPC/1.Semester/Maschinelles Lernen/opencv/build/java/opencv-4100.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../_opencv/opencv/build/java/opencv-4100.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../_opencv/opencv/build/java/opencv-4100.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

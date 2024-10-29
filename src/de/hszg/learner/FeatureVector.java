@@ -19,6 +19,6 @@ public interface FeatureVector extends Serializable{
 	 * @param i the index of the feature in the vector
 	 * @return the value of the feater with index i
 	 */
-	int getFeatureValue(int i);
+	double getFeatureValue(int i);
 
 }

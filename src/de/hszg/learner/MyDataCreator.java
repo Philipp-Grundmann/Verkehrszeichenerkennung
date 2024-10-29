@@ -12,6 +12,7 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+
 public class MyDataCreator {
 
 	private static final String filename = "DummyData"+generateDateTimeforFilename()+".dat";
@@ -20,17 +21,13 @@ public class MyDataCreator {
 	 * Constuctor für DummyDaten
 	 */
 	MyDataCreator(){
-		int[] ColorArray = new int[125];
+		double[] ColorArray = new double[125];
 		int DummyCorner = 1;
 
 		FeatureVector[] f = new FeatureVector[6];
 		f[0] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		f[1] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		f[2] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		f[3] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		f[4] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		f[5] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-		
+
+		/*
 		List<FeatureVector> res = new LinkedList<>();
 		for(FeatureVector fv : f) res.add(fv);
 		try{
@@ -40,18 +37,18 @@ public class MyDataCreator {
 		}catch(Throwable t){
 			System.out.println("DummyDataCreator: Could not create DummyData.dat");
 			t.printStackTrace();
-		}
+		}*/
+		saveManyFeatureVektores(f, "C:\\3500");
+
 	}
 
 	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, LearnerType LernerTypeInput ){
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
-		
-		// Beispielpfad für Struktur: 
-		//String folderPath = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichen\\Test";
 
-		// Verarbeite alle Bilder im Ordner
-		File folder = new File(FolderPathnameData);
+		// Verarbeite alle Bilder in einem Ordner
+		File folder = new File(FolderPathnameImages);
 		File[] listOfFiles = folder.listFiles();
+
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 
 		if (listOfFiles == null) {
@@ -62,6 +59,7 @@ public class MyDataCreator {
 			for (File file : listOfFiles) {
 				if (file.isFile() && isImageFile(file)) {
 					System.out.println("Verarbeite Bild: " + file.getName());
+					System.out.println(file.getAbsolutePath());
 
 					// Bild laden
 					Mat image = Imgcodecs.imread(file.getAbsolutePath());
@@ -78,8 +76,8 @@ public class MyDataCreator {
 			}
 		}
 
-
-		
+		//Schreibt alle Featurevektoren in eine .dat-Datei
+		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), "C:\\3500");
 		
 		
 		//FolderPathenameData in ausgewählen Lerner laden/lernen
@@ -116,7 +114,26 @@ public class MyDataCreator {
 		return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".bmp");
 	}
 
+	public void saveManyFeatureVektores(FeatureVector[] ArrayOfAllFeaturevektores,String FolderPathnameData) {
+		String filename = FolderPathnameData+"\\VektorData"+generateDateTimeforFilename()+".dat";
+
+		List<FeatureVector> res = new LinkedList<>();
+		for(FeatureVector fv : ArrayOfAllFeaturevektores) res.add(fv);
+		try{
+			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
+			out.writeObject(res);
+			out.close();
+		}catch(Throwable t){
+			System.out.println("DummyDataCreator: Could not create DummyData.dat");
+			t.printStackTrace();
+		}
+	}
+
+
 	public static void main(String[] args) {
-		new MyDataCreator();
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
+		new MyDataCreator("C:\\3500","C:\\3500",LearnerType.EagerLerning);  //Testdaten erstellen
+		//new MyDataCreator(); //DummyData Creater
 	}
 }
