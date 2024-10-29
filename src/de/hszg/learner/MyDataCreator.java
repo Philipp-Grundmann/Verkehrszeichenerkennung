@@ -6,11 +6,10 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
 
 public class MyDataCreator {
@@ -42,6 +41,8 @@ public class MyDataCreator {
 
 	}
 
+
+	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
 	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, LearnerType LernerTypeInput ){
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
@@ -88,6 +89,118 @@ public class MyDataCreator {
 
 	}
 
+
+	//Rückgabestrukur {Concept1=[Filename1, Filename2, Filename3,...],Concept2=[Filename1, Filename2, Filename3,...],.. }
+	public static Map<File, Concept> loadFilesByFolder(String rootFolderPath, int maxFiles) {
+		Map<Concept, List<File>> filesByFolder = new HashMap<>();
+		Map<File, Concept> fileToConceptMap = new HashMap<>(); //Wird benötigt für angepasste Ausgabe
+
+		File rootFolder = new File(rootFolderPath);
+
+		if (!rootFolder.isDirectory()) {
+			System.err.println("Pfad ist kein Verzeichnis: " + rootFolderPath);
+			return fileToConceptMap;
+		}
+
+		File[] mainFolders = rootFolder.listFiles(File::isDirectory);
+		if (mainFolders != null) {
+			for (File mainFolder : mainFolders) {
+				List<File> filesList = new ArrayList<>();
+				loadFilesRecursiv(mainFolder, filesList, maxFiles);
+				filesByFolder.put(mainFolderName_StrToConcept(mainFolder.getName()), filesList); //MainFolder.GetName() -> Verarbeiten in
+			}
+		}
+		System.out.println("Verarbeitete Dateien: "); //Systemausgabe über die verarbeiteten Dateien
+		//System.out.println(filesByFolder);
+		//Rückgabestrukur {Concept1=[Filename1, Filename2, Filename3,...],Concept2=[Filename1, Filename2, Filename3,...],.. }
+
+		//Anpassen der Datenstruktur in [[Concept1, Filename1], [Concept1, Filename2], [Concept1, Filename3],...]
+		for (Map.Entry<Concept, List<File>> entry : filesByFolder.entrySet()) {
+			Concept concept = entry.getKey();        // Das Concept
+			List<File> files = entry.getValue();     // Die Liste der Files
+
+			for (File file : files) {
+				fileToConceptMap.put(file, concept); // Datei als Schlüssel, Concept als Wert
+			}
+		}
+		System.out.println(fileToConceptMap);
+		System.out.println("Anzahl der Verarbeiten Dateien: "+fileToConceptMap.size());
+		return fileToConceptMap;
+	}
+
+
+	public static Concept mainFolderName_StrToConcept(String MainFolderName){
+		switch (MainFolderName){
+			case "209 - Fahrtrichtung links": 	return Concept.Fahrtrichtung_links;
+			case "306 - Vorfahrtsstraße": 		return Concept.Vorfahrtsstraße;
+			case "206 - Stop": 					return Concept.Stoppschild;
+			case "205 - Vorfahrt gewähren": 	return  Concept.Vorfahrt_gewähren;
+			case "209 - Fahrtrichtung rechts":	return Concept.Fahrtrichtung_rechts;
+			case "102 - Vorfahrt von rechts":	return Concept.Vorfahrt_von_Rechts;
+			default:
+				System.out.println("Das Verkehrszeichen konnte nicht Identifiziert werden!");
+				return Concept.Unknown;
+		}
+	}
+
+	/*
+	//Läd rekursiv die zu verarbeitenden Dateien aus einem Verzeichnis
+	private static void loadFilesRecursively(File folder, List<File> filesList, int maxFiles) {
+		if (maxFiles != -1 && filesList.size() >= maxFiles) return;
+
+
+
+		File[] files = folder.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					loadFilesRecursively(file, filesList, maxFiles);
+				} else {
+					filesList.add(file);
+					if (maxFiles != -1 && filesList.size() >= maxFiles) break;
+				}
+			}
+		}
+	} */
+
+
+
+	private static void loadFilesRecursiv(File folder, List<File> filesList, int maxFiles) {
+		File[] subFiles = folder.listFiles();
+
+		// Prüfen, ob der aktuelle Ordner ein Blatt-Ordner ist (keine Unterordner)
+		if (subFiles != null && containsOnlyFiles(subFiles)) {
+			int fileCount = 0;
+			for (File file : subFiles) {
+				if (file.isFile()) {
+					filesList.add(file);
+					fileCount++;
+					if (maxFiles != -1 && fileCount >= maxFiles) {
+						break;
+					}
+				}
+			}
+		} else if (subFiles != null) {
+			// Ordner ist kein Blatt-Ordner, rekursiv fortfahren
+			for (File subFile : subFiles) {
+				if (subFile.isDirectory()) {
+					loadFilesRecursiv(subFile, filesList, maxFiles);
+				}
+			}
+		}
+	}
+
+
+	private static boolean containsOnlyFiles(File[] files) {
+		for (File file : files) {
+			if (file.isDirectory()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+
 	/**
 	 * Zeit+Datumsformatierung für Dateinamen
 	 * Funktion wurde mit ChatGPT generiert und übernommen
@@ -132,8 +245,9 @@ public class MyDataCreator {
 
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		new MyDataCreator("C:\\3500","C:\\3500",LearnerType.EagerLerning);  //Testdaten erstellen
+		//new MyDataCreator("C:\\3500","C:\\3500",LearnerType.EagerLerning);  //Testdaten erstellen - hat funktioniert
 		//new MyDataCreator(); //DummyData Creater
 	}
 }
