@@ -5,6 +5,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -22,27 +23,42 @@ public class ImageProcessor {
 
     int corner=0;
     double[] AlleFarbvektoren=new double[CountFields];
-    Concept c=Concept.Stoppschild; //TODO Default anpassen
+    Concept c; //Concept des Bildes
 
     FeatureVector Output_Vektor;
 
 
     //Constuructor MAT als Input -> Ziel: Alle Feature Vektoren als Output
-    ImageProcessor(Mat image){
+    ImageProcessor(Mat image, Concept concept){
+        c=concept;
+        if (image == null) {
+            return; //nur zur sicherheit
+        }
+
         Mat croppedImage = removeWhiteBorder(image);
 
+        if (croppedImage == null) {
+            return;//nur zur sicherheit
+        }
+
         if (save_crop_Image) {
-            saveImage("cropped_image.bmp", croppedImage);
+            saveImage("C:\\temp\\cropped_image"+MyDataCreator.generateDateTimeforFilename()+".bmp", croppedImage);
         }
 
         //
         //Eckenerkennung, mit Mitteln von OpenCV auf Graustufenbild
         //
+        /*
         Mat grayImage = convertToGrayscale(croppedImage); // Bild in Graustufen konvertieren
         Mat edges = detectEdgesWithCanny(grayImage, 100, 200); // Kanten mit Canny-Edge-Detection erkennen
         MatOfPoint cornersMatOfPoint = detectCorners(edges, 100, 0.3, 300); // Eckenerkennung basierend auf den Kanten
         Point[] cornerPoints = cornersMatOfPoint.toArray();
-        corner=cornerPoints.length; //Erkannte
+        corner=cornerPoints.length; //Erkannt
+         */
+        //TODO Erkennung überarbeiten
+        corner=0;
+
+        //System.out.println("Anzahl erkannter ecken: "+corner);
 
         // Anzahl der erkannten Ecken ausgeben
         //printCornerCount(cornersMatOfPoint,"feature_vectors.csv");
@@ -50,18 +66,17 @@ public class ImageProcessor {
 
         if (save_corner_Marker) {
             //Ecken in Bild markieren
-            for (Point corner : cornerPoints) {
-                Imgproc.circle(croppedImage, corner, 5, new Scalar(0, 0, 255), 2);  // Ecken rot markieren
-            }
+           // for (Point corner : cornerPoints) {
+            //    Imgproc.circle(croppedImage, corner, 5, new Scalar(0, 0, 255), 2);  // Ecken rot markieren
+           // }
 
             // Ausgabe des Bildes mit eingezeichneten Ecken
-            saveImage("corners_with_canny.bmp", croppedImage);
+            saveImage("C:\\temp\\corner_image"+MyDataCreator.generateDateTimeforFilename()+".bmp", croppedImage);
         }
 
         // Bildgröße und Raster analysieren (normalizedImage, gridRows, gridCols)
         AlleFarbvektoren= analyzeImageInGrid(croppedImage, gridRows, gridCols);
-
-        //ToDo Concept Verarbeiten
+        //ToDo Analyze Image Grid
 
         Output_Vektor=new MyFeatureVector(corner,AlleFarbvektoren,c);
 
@@ -74,6 +89,11 @@ public class ImageProcessor {
     public static Mat removeWhiteBorder(Mat image) {
         int top = 0, bottom = image.rows() - 1, left = 0, right = image.cols() - 1;
         int threshold = 240;  // Schwellwert für Weiß (näher an 255)
+
+        double[] pixel = image.get(0, 0);
+        threshold=(int) ((pixel[0]+pixel[1]+pixel[2])/3)-20;
+        //System.out.println("Schwellwert für Croop:" + threshold);
+
 
         // Weiß von oben entfernen
         for (int row = 0; row < image.rows(); row++) {
@@ -167,7 +187,7 @@ public class ImageProcessor {
         int height = image.height();
         int cellWidth = width / gridCols;
         int cellHeight = height / gridRows;
-        double[] AlleFarbVektoren= new double[125];
+        double[] AlleFarbVektoren= new double[gridCols*gridRows*5];
         int i = 0;
 
         // Iteriere über das Raster
@@ -182,48 +202,52 @@ public class ImageProcessor {
                 // Farbanteile für einen Rasterteil berechnen
                 // ist der Farbvektor für einen Bildausschnitt mit den fünf Werten: Rot, Gelb, Blau, Weiß, Schwarz
                 double[] FarbVektor = analyzeColorInGrid(image.submat(startY, endY, startX, endX));
-                System.arraycopy(FarbVektor,0,AlleFarbVektoren,i,5);
-                System.out.println("Ausgabe aller Farbvektoren eines Bildes"+AlleFarbVektoren);
+                System.arraycopy(FarbVektor,0,AlleFarbVektoren,i*5,5);
+                //System.out.println("Ausgabe aller Farbvektoren eines Bildes"+ Arrays.toString(AlleFarbVektoren));
 
                 // Ausgabe des Feature-Vektors für das Rasterfeld
                 // Funktion aktuelle nicht implimentier
                 //printFeatureVector(featureVector, row, col);
-
                 i++;
-                return AlleFarbVektoren;
+
             }
         }
-        return null;
+        return AlleFarbVektoren;
+        //return null;
     }
 
     // Analyse der Farben im Rasterfeld und Erstellen des Feature-Vektors für ein Rasterfeld
     //
     private static double[] analyzeColorInGrid(Mat grid) {
         BufferedImage bufferedImage = matToBufferedImage(grid); // Konvertierung zu BufferedImage
-        int totalPixels = bufferedImage.getWidth() * bufferedImage.getHeight();
-        HashMap<String, Integer> colorCounts = new HashMap<>();
 
-        colorCounts.put("Rot", 0);
-        colorCounts.put("Gelb", 0);
-        colorCounts.put("Blau", 0);
-        colorCounts.put("Weiß", 0);
-        colorCounts.put("Schwarz", 0);
+        if (bufferedImage != null) {
+            int totalPixels = bufferedImage.getWidth() * bufferedImage.getHeight();
+            HashMap<String, Integer> colorCounts = new HashMap<>();
 
-        // Über alle Pixel des Rasters iterieren
-        for (int y = 0; y < bufferedImage.getHeight(); y++) {
-            for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                int rgb = bufferedImage.getRGB(x, y); // Beispiel: ARGB-Wert des Pixels (0,0)
-                int alpha = (rgb >> 24) & 0xff;
-                int red = (rgb >> 16) & 0xff;
-                int green = (rgb >> 8) & 0xff;
-                int blue = (rgb) & 0xff;
+            colorCounts.put("Rot", 0);
+            colorCounts.put("Gelb", 0);
+            colorCounts.put("Blau", 0);
+            colorCounts.put("Weiß", 0);
+            colorCounts.put("Schwarz", 0);
 
-                classifyColor(red, green, blue,colorCounts);
+            // Über alle Pixel des Rasters iterieren
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                for (int x = 0; x < bufferedImage.getWidth(); x++) {
+                    int rgb = bufferedImage.getRGB(x, y); // Beispiel: ARGB-Wert des Pixels (0,0)
+                    int alpha = (rgb >> 24) & 0xff;
+                    int red = (rgb >> 16) & 0xff;
+                    int green = (rgb >> 8) & 0xff;
+                    int blue = (rgb) & 0xff;
+
+                    classifyColor(red, green, blue, colorCounts);
+                }
             }
-        }
 
-        // Erstelle den Feature-Vektor basierend auf den Farbanteilen
-        return normalizeColorVector(colorCounts, totalPixels);
+            // Erstelle den Feature-Vektor basierend auf den Farbanteilen
+            return normalizeColorVector(colorCounts, totalPixels);
+        }
+        return new double[5];
     }
 
 
@@ -344,7 +368,7 @@ public class ImageProcessor {
 
 
     FeatureVector getOutput_Vektor(){
-
+        //System.out.println("Erzeugter Vektor - Concept: "+ c +" | Output-Vektor: "+Output_Vektor.toString());
         return Output_Vektor;
     }
 

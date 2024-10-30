@@ -43,42 +43,51 @@ public class MyDataCreator {
 
 
 	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
-	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, LearnerType LernerTypeInput ){
+	MyDataCreator(String FolderPathnameImages, String FolderPathnameData){
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
 		// Verarbeite alle Bilder in einem Ordner
-		File folder = new File(FolderPathnameImages);
-		File[] listOfFiles = folder.listFiles();
+		//File folder = new File(FolderPathnameImages);
+		//File[] listOfFiles = folder.listFiles();
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
+		int sum=fileToConceptMap.size();
+		int progress=0;
 
-		if (listOfFiles == null) {
+		if (fileToConceptMap.isEmpty()) {
 			System.out.println("Der Ordner der Bilddaten ist leer oder existiert nicht.");
-		}
-		else{
-			// Schleife durch alle Dateien im Ordner
-			for (File file : listOfFiles) {
-				if (file.isFile() && isImageFile(file)) {
-					System.out.println("Verarbeite Bild: " + file.getName());
-					System.out.println(file.getAbsolutePath());
+		} else {
+			for (Map.Entry<File, Concept> entry : fileToConceptMap.entrySet()) {
+				File file = entry.getKey();
+				Concept concept = entry.getValue();
 
-					// Bild laden
+				progress++;
+				float progress_percent=(float) progress/sum*100;
+
+				if (file.isFile() && isImageFile(file)) {
+					System.out.printf("Fortschritt: %.2f%% (%d/%d) | Verarbeite Bild: %s | Konzept: %s%n", progress_percent, progress, sum, file.getName(), concept);
+
+					//System.out.println(file.getAbsolutePath());
+
 					Mat image = Imgcodecs.imread(file.getAbsolutePath());
 
 					if (!image.empty()) {
-						//Bild wird verarbeitet und Featurevektor wird der Liste hinzugefügt
-						ImageProcessor MyImageProcessor=new ImageProcessor(image);
-						FeatureVector MyFeatureVektor=MyImageProcessor.getOutput_Vektor();
-						AllFeatureVektores.add(MyFeatureVektor);
+						// Bild wird verarbeitet und Featurevektor wird der Liste hinzugefügt
+						ImageProcessor myImageProcessor = new ImageProcessor(image,concept);
+						FeatureVector myFeatureVector = myImageProcessor.getOutput_Vektor();
+						System.out.println("Ausgabe Vektor: ");
+						//System.out.print(myFeatureVector.getPrintVektorValue());
+						AllFeatureVektores.add(myFeatureVector);
 					} else {
 						System.out.println("Fehler beim Laden des Bildes: " + file.getName());
+							}
+						}
 					}
-				}
-			}
 		}
 
 		//Schreibt alle Featurevektoren in eine .dat-Datei
-		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), "C:\\3500");
+		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), FolderPathnameData);
 		
 		
 		//FolderPathenameData in ausgewählen Lerner laden/lernen
@@ -132,9 +141,9 @@ public class MyDataCreator {
 	public static Concept mainFolderName_StrToConcept(String MainFolderName){
 		switch (MainFolderName){
 			case "209 - Fahrtrichtung links": 	return Concept.Fahrtrichtung_links;
-			case "306 - Vorfahrtsstraße": 		return Concept.Vorfahrtsstraße;
+			case "306 - Vorfahrtsstrasse": 		return Concept.Vorfahrtsstraße;
 			case "206 - Stop": 					return Concept.Stoppschild;
-			case "205 - Vorfahrt gewähren": 	return  Concept.Vorfahrt_gewähren;
+			case "205 - Vorfahrt gewaehren": 	return  Concept.Vorfahrt_gewähren;
 			case "209 - Fahrtrichtung rechts":	return Concept.Fahrtrichtung_rechts;
 			case "102 - Vorfahrt von rechts":	return Concept.Vorfahrt_von_Rechts;
 			default:
@@ -245,9 +254,9 @@ public class MyDataCreator {
 
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		loadFilesByFolder("C:\\Verkehrszeichen",3);
+		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		//new MyDataCreator("C:\\3500","C:\\3500",LearnerType.EagerLerning);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500");  //Testdaten erstellen - hat funktioniert
 		//new MyDataCreator(); //DummyData Creater
 	}
 }

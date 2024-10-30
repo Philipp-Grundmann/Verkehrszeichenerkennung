@@ -21,4 +21,5 @@ public interface FeatureVector extends Serializable{
 	 */
 	double getFeatureValue(int i);
 
+	String getPrintVektorValue();
 }
