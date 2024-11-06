@@ -21,7 +21,7 @@ public class Evaluator {
 	public Evaluator(String filename) {
 		List<FeatureVector> vectors = readData(filename);
 		Learner learner = new LazyLerningKNN_Lerner(3);
-				
+
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
 		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
 		// wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
@@ -33,9 +33,12 @@ public class Evaluator {
 			learner.learn(sets.get(0));
 			Vector<Integer> result = evaluate(sets.get(1),learner);
 			evalResult(result);
+			BerechnungStatistikwerte(result);
 			i++;
 		}while(i<3); //TODO: eine andere Abbruchbedingung verwenden
-		
+
+
+
 	}
 	/**
 	 * Evaluate the result from the test for output or furthjer considerations
@@ -134,8 +137,58 @@ public class Evaluator {
 		else 
 			filename = args[0];
 		*/
-		String filename="C:\\3500\\VektorData_20241030_001214.dat";
+		String filename="C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\VektorData_20241030_105858.dat";
 		new Evaluator(filename);
 		
+	}
+
+
+	public void BerechnungStatistikwerte(Vector<Integer> result ) {
+		// Angenommene Werte für richtig, falsch und unbekannt klassifizierte Bilder
+		int richtig = result.get(0);  // Beispielwert für richtig klassifizierte Bilder
+		int falsch = result.get(1);    // Beispielwert für falsch klassifizierte Bilder
+		int unbekannt = result.get(2); // Beispielwert für unbekannt klassifizierte Bilder
+
+		// Gesamtanzahl der Bilder berechnen
+		int gesamt = richtig + falsch + unbekannt;
+		if (gesamt == 0) {
+			System.out.println("Die Gesamtanzahl der Bilder darf nicht 0 sein.");
+			return;
+		}
+
+		// Konstante für 95%-Konfidenzintervall (z-Wert = 1.96)
+		double zWert = 1.96;
+
+		// Berechnungen
+		double erfolgsrate = berechneErfolgsrate(richtig, gesamt);
+		double standardabweichung = berechneStandardabweichung(erfolgsrate, gesamt);
+		double[] konfidenzintervall = berechneKonfidenzintervall(erfolgsrate, zWert, standardabweichung);
+
+		// Ausgabe der Ergebnisse
+		System.out.printf("Erfolgsrate (richtig klassifizierte Bilder): %.4f%n", erfolgsrate);
+		System.out.printf("Standardabweichung: %.4f%n", standardabweichung);
+		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
+	}
+
+	// Methode zur Berechnung der Erfolgsrate (richtig klassifizierte Bilder / alle Bilder)
+	public static double berechneErfolgsrate(int richtig, int gesamt) {
+		return (double) richtig / gesamt;
+	}
+
+	// Methode zur Berechnung der Standardabweichung für eine Binomialverteilung
+	public static double berechneStandardabweichung(double erfolgsrate, int gesamt) {
+		return Math.sqrt(erfolgsrate * (1 - erfolgsrate) / gesamt);
+	}
+
+	// Methode zur Berechnung des Konfidenzintervalls
+	public static double[] berechneKonfidenzintervall(double erfolgsrate, double zWert, double standardabweichung) {
+		double untereGrenze = erfolgsrate - zWert * standardabweichung;
+		double obereGrenze = erfolgsrate + zWert * standardabweichung;
+
+		// Sicherheitskontrolle, damit das Konfidenzintervall zwischen 0 und 1 bleibt
+		untereGrenze = Math.max(0, untereGrenze);
+		obereGrenze = Math.min(1, obereGrenze);
+
+		return new double[]{untereGrenze, obereGrenze};
 	}
 }
