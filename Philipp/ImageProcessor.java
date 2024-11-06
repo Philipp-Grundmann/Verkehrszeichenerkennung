@@ -28,21 +28,21 @@ public class ImageProcessor {
             System.out.println("Der Ordner ist leer oder existiert nicht.");
             return;
         }
+        else{
+            // Schleife durch alle Dateien im Ordner
+            for (File file : listOfFiles) {
+                if (file.isFile() && isImageFile(file)) {
+                    System.out.println("Verarbeite Bild: " + file.getName());
 
-        // Schleife durch alle Dateien im Ordner
-        for (File file : listOfFiles) {
-            if (file.isFile() && isImageFile(file)) {
-                System.out.println("Verarbeite Bild: " + file.getName());
+                    // Bild laden
+                    Mat image = Imgcodecs.imread(file.getAbsolutePath());
 
-                // Bild laden
-                Mat image = Imgcodecs.imread(file.getAbsolutePath());
-
-                if (!image.empty()) {
-                    // Hier die gewünschte Verarbeitung durchführen
-                    // Zum Beispiel: Farbbestimmung, Eckenerkennung usw.
-                    processImage(image);
-                } else {
-                    System.out.println("Fehler beim Laden des Bildes: " + file.getName());
+                    if (!image.empty()) {
+                        //TODO:Funktion durch Classe ersetzen
+                        processImage(image);
+                    } else {
+                        System.out.println("Fehler beim Laden des Bildes: " + file.getName());
+                    }
                 }
             }
         }
