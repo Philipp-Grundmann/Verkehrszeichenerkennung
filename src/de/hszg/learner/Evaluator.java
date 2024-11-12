@@ -3,21 +3,34 @@ package de.hszg.learner;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-
-
-
+import java.util.*;
 
 
 public class Evaluator {
-	/** the percentage (between 0 und 100) of vectors from the data to be used for the test
+	/** the percentage (between 0 und 100) of vectors from the data to be used for the test, all others are training
 	*/
-	private static int testRate = 40; 
+	private static int testRate = 40;
+	/*
+	//Philips Pfade
+	//Datei welche Featurevektoren enthält und eingelesen wird
+	static String filename_feature_vektor ="C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\VektorData_20241030_105858.dat";
 
-	
+	//Datei in welche die Ergebnisse einer Laufzeit eingelesen werden
+	//String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse_"+MyDataCreator.generateDateTimeforFilename()+".csv";
+	String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebniss.csv";
+*/
+
+	//Markus Pfade
+	//Datei welche Featurevektoren enthält und eingelesen wird
+	static String filename_feature_vektor ="C:\\Code\\Daten\\VektorData_20241030_011840.dat";
+
+	//Datei in welche die Ergebnisse einer Laufzeit eingelesen werden
+	//String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse_"+MyDataCreator.generateDateTimeforFilename()+".csv";
+	String filename_results_statistics = "C:\\Code\\Daten\\ergebniss.csv";
+
+
+
+
 	public Evaluator(String filename) {
 		List<FeatureVector> vectors = readData(filename);
 		Learner learner = new LazyLerningKNN_Lerner(3);
@@ -28,12 +41,20 @@ public class Evaluator {
 		int i=0;
 
 		do{
-			vectors = mixData(vectors);
-			List<List<FeatureVector>> sets = extractTrainingData(vectors);
+			vectors = mixData(vectors, i);					//shuffle mit i als Seed
+			List<List<FeatureVector>> sets = extractTrainingData(vectors); //Aufteilung der Featurevektordaten in Test und Trainingsdaten
+
+			Vector<Integer> result_lern=new Vector<>();		//Vektor mit Werten bezüglich des Lernprozesses
+			result_lern.add(0, vectors.size());		//Vektor 0 = Gesamtanzahl aller Datensätze
+			result_lern.add(1, sets.get(0).size());	//Vektor 1 = Anzahl der Trainingsdaten
+			result_lern.add(2, sets.get(1).size());	//Vektor 2 = Anzahl der Testdaten
+			result_lern.add(3,i);						//Vektor 3 = N eines Durchganges
+
+
 			learner.learn(sets.get(0));
-			Vector<Integer> result = evaluate(sets.get(1),learner);
-			evalResult(result);
-			BerechnungStatistikwerte(result);
+			Vector<Integer> result_classify = evaluate(sets.get(1),learner);
+			evalResult(result_lern, result_classify);
+
 			i++;
 		}while(i<3); //TODO: eine andere Abbruchbedingung verwenden
 
@@ -42,12 +63,43 @@ public class Evaluator {
 	}
 	/**
 	 * Evaluate the result from the test for output or furthjer considerations
-	 * @param result a Vector containing 3 values: a) right classification ba used learner, 
-	 * b) lerner could not decide or c) learner found wrong concept
+	 * @param result_lern Ergebnissvektor der Lernfunktion mit Einstellungsparametern
+	 * @param result_classify Ergebnissvektor des Klassifizierungsprozesses, welche die Grundlage für eine statistische Auswertung bilden
 	 */
-	private void evalResult(Vector<Integer> result) {
+	private void evalResult(Vector<Integer>result_lern, Vector<Integer> result_classify) {
 		// TODO hier muss mehr Auswertung passieren, insbes: Vertrauensintervalle etc
-		System.out.println("Learning result: \n correct: "+result.get(0)+"\n unknown: "+result.get(1)+"\n wrong: "+result.get(2));
+		System.out.println("Learning result: \n correct: "+result_classify.get(0)+"\n unknown: "+result_classify.get(1)+"\n wrong: "+result_classify.get(2));
+
+		// Angenommene Werte für richtig, falsch und unbekannt klassifizierte Bilder
+		int richtig = result_classify.get(0);  // Beispielwert für richtig klassifizierte Bilder
+		int falsch = result_classify.get(1);    // Beispielwert für falsch klassifizierte Bilder
+		int unbekannt = result_classify.get(2); // Beispielwert für unbekannt klassifizierte Bilder
+
+		// Gesamtanzahl der Bilder berechnen
+		int gesamt = richtig + falsch + unbekannt;
+		if (gesamt == 0) {
+			System.out.println("Die Gesamtanzahl der Bilder darf nicht 0 sein.");
+			return;
+		}
+
+		// Konstante für 95%-Konfidenzintervall (z-Wert = 1.96)
+		double zWert = 1.96;
+
+		// Berechnungen
+		double erfolgsrate = berechneErfolgsrate(richtig, gesamt);
+		double durchschnittlicherFehler = berechneDurchschnittlichenFehler(falsch, gesamt);
+		double standardabweichung = berechneStandardabweichung(erfolgsrate, gesamt);
+		double[] konfidenzintervall = berechneKonfidenzintervall(erfolgsrate, zWert, standardabweichung);
+
+		// Ausgabe der Ergebnisse
+		System.out.printf("Erfolgsrate (richtig klassifizierte Bilder): %.4f%n", erfolgsrate);
+		System.out.printf("Durchschnittlicher Fehler (falsch klassifizierte Bilder): %.4f%n", durchschnittlicherFehler);
+		System.out.printf("Standardabweichung: %.4f%n", standardabweichung);
+		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
+
+		// Pfad zur CSV-Datei ist in Klasse globale definiert
+		schreibeStatistikInCsv(filename_results_statistics,result_lern,gesamt, erfolgsrate, durchschnittlicherFehler, standardabweichung, konfidenzintervall);
+
 	}
 	/** evaluate the learner with a given test set. 
 	 * 
@@ -77,8 +129,8 @@ public class Evaluator {
  * @return list containing the same vectors as parameter but 
  * (usually) in different order
  */
-	private List<FeatureVector> mixData(List<FeatureVector> vectors) {
-		Collections.shuffle(vectors);
+	private List<FeatureVector> mixData(List<FeatureVector> vectors, int seedValue) {
+		Collections.shuffle(vectors, new Random(seedValue));
 		return vectors;
 	}
 
@@ -124,66 +176,23 @@ public class Evaluator {
 		return vectors;
 	}
 
-	/** run the program with training set provided in file with 
-	 * name given in first parameter
-	 * @param args 1. filename of Serialiszed List<FeatureVector>
+	/** startet das Programm mit den hinterlegten Trainingsdaten
 	 */
 	public static void main(String[] args){
-		/*String filename="C:\\3500\\VektorData_20241029_205425.dat";
-		if(args.length==0){
-			System.out.println("No data file provided, using dummy data: DummyData.dat");
-			filename = "DummyData.dat";
-		}
-		else 
-			filename = args[0];
-		*/
-		String filename="C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\VektorData_20241030_105858.dat";
-		new Evaluator(filename);
-		
-	}
-
-
-	public void BerechnungStatistikwerte(Vector<Integer> result ) {
-		// Angenommene Werte für richtig, falsch und unbekannt klassifizierte Bilder
-		int richtig = result.get(0);  // Beispielwert für richtig klassifizierte Bilder
-		int falsch = result.get(1);    // Beispielwert für falsch klassifizierte Bilder
-		int unbekannt = result.get(2); // Beispielwert für unbekannt klassifizierte Bilder
-
-		// Gesamtanzahl der Bilder berechnen
-		int gesamt = richtig + falsch + unbekannt;
-		if (gesamt == 0) {
-			System.out.println("Die Gesamtanzahl der Bilder darf nicht 0 sein.");
-			return;
-		}
-
-		// Konstante für 95%-Konfidenzintervall (z-Wert = 1.96)
-		double zWert = 1.96;
-
-		// Berechnungen
-		double erfolgsrate = berechneErfolgsrate(richtig, gesamt);
-		double durchschnittlicherFehler = berechneDurchschnittlichenFehler(falsch, gesamt);
-		double standardabweichung = berechneStandardabweichung(erfolgsrate, gesamt);
-		double[] konfidenzintervall = berechneKonfidenzintervall(erfolgsrate, zWert, standardabweichung);
-
-		// Ausgabe der Ergebnisse
-		System.out.printf("Erfolgsrate (richtig klassifizierte Bilder): %.4f%n", erfolgsrate);
-		System.out.printf("Durchschnittlicher Fehler (falsch klassifizierte Bilder): %.4f%n", durchschnittlicherFehler);
-		System.out.printf("Standardabweichung: %.4f%n", standardabweichung);
-		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
-
-		// Pfad zur CSV-Datei
-		String dateiPfad = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse.csv";
-		schreibeStatistikInCsv(dateiPfad, erfolgsrate, durchschnittlicherFehler, standardabweichung, konfidenzintervall);
+		//filename_feature_vektor ist als static String innerhalb der Klasse definiert
+		new Evaluator(filename_feature_vektor);
 	}
 
 	// Methode zur Berechnung der Erfolgsrate (richtig klassifizierte Bilder / alle Bilder)
 	public static double berechneErfolgsrate(int richtig, int gesamt) {
 		return (double) richtig / gesamt;
 	}
+
 	// Methode zur Berechnung des durchschnittlichen Fehlers (falsch klassifizierte Bilder / alle Bilder)
 	public static double berechneDurchschnittlichenFehler(int falsch, int gesamt) {
 		return (double) falsch / gesamt;
 	}
+
 	// Methode zur Berechnung der Standardabweichung für eine Binomialverteilung
 	public static double berechneStandardabweichung(double erfolgsrate, int gesamt) {
 		return Math.sqrt(erfolgsrate * (1 - erfolgsrate) / gesamt);
@@ -203,26 +212,41 @@ public class Evaluator {
 
 	public static void schreibeStatistikInCsv(
 			String dateiPfad,
+			Vector<Integer> result_lern,
+			int gesamtanzahl, //Addition aller Auswertedaten
 			double erfolgsrate,
 			double durchschnittlicherFehler,
 			double standardabweichung,
 			double[] konfidenzintervall) {
 
 		// Format für Datum und Uhrzeit
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm:ss");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd; HH:mm:ss");
 		String zeitstempel = LocalDateTime.now().format(formatter);
 
 		// CSV-Zeile im gewünschten Format erstellen
-		String zeile = String.format("%s, %.4f, %.4f, %.4f, [%.4f, %.4f]%n",
-				zeitstempel, erfolgsrate, durchschnittlicherFehler, standardabweichung,
+		String zeile = String.format("%s; %d; %d; %d; %d; %d; %.4f; %.4f; %.4f; [%.4f; %.4f]%n",
+				zeitstempel,
+				result_lern.get(0),gesamtanzahl,result_lern.get(1), result_lern.get(2), result_lern.get(3),
+				erfolgsrate, durchschnittlicherFehler, standardabweichung,
 				konfidenzintervall[0], konfidenzintervall[1]);
 
-		// Ergebnisse in die CSV-Datei schreiben
-		try (FileWriter writer = new FileWriter(dateiPfad, true)) {
-			// Falls die Datei neu ist, füge die Kopfzeile hinzu
-			writer.write("Datum, Uhrzeit, Erfolgsrate, Durchschnittlicher Fehler, Standardabweichung, Konfidenzintervall\n");
-			writer.write(zeile);
-			System.out.println("Ergebnisse wurden erfolgreich in die CSV-Datei geschrieben.");
+		try {
+			// Überprüfen, ob die Datei existiert
+			File datei = new File(dateiPfad);
+			boolean istDateiNeu = !datei.exists();
+
+			// Datei im Append-Modus öffnen
+			try (FileWriter writer = new FileWriter(dateiPfad, true)) {
+				// Falls die Datei neu ist, schreibe die Kopfzeile
+				if (istDateiNeu) {
+					//writer.write("Datum; Uhrzeit; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
+					writer.write("Datum; Uhrzeit;Gesamtanzahl; Gesamtanzahl_Add; Anz_Trainingsdaten; Anz_Testdaten; n-Runde; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
+				}
+				// Schreibe die Datenzeile
+				writer.write(zeile);
+
+				System.out.println("Ergebnisse wurden erfolgreich in die CSV-Datei geschrieben.");
+			}
 		} catch (IOException e) {
 			System.out.println("Fehler beim Schreiben in die CSV-Datei: " + e.getMessage());
 		}

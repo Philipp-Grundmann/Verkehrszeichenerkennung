@@ -2,6 +2,7 @@ package de.hszg.learner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class LazyLerningKNN_Lerner implements Learner {
     private List<FeatureVector> trainingSet=new ArrayList<>();
@@ -12,8 +13,13 @@ public class LazyLerningKNN_Lerner implements Learner {
     }
 
     @Override
-    public void learn(List<FeatureVector> trainingSet) {
+    public Vector<Integer> learn(List<FeatureVector> trainingSet) {
         this.trainingSet = trainingSet;
+
+        //Gibt einen Vektor von Werten zur Verwendung in der Auswertung zurück
+        Vector<Integer> res = new Vector<>();
+        res.add(0,this.trainingSet.size()); //Anzahl aller gelernten Feature-Vektoren
+        return res;
     }
 
     @Override
