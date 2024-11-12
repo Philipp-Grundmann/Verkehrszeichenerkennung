@@ -1,8 +1,8 @@
 package de.hszg.learner;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -161,20 +161,29 @@ public class Evaluator {
 
 		// Berechnungen
 		double erfolgsrate = berechneErfolgsrate(richtig, gesamt);
+		double durchschnittlicherFehler = berechneDurchschnittlichenFehler(falsch, gesamt);
 		double standardabweichung = berechneStandardabweichung(erfolgsrate, gesamt);
 		double[] konfidenzintervall = berechneKonfidenzintervall(erfolgsrate, zWert, standardabweichung);
 
 		// Ausgabe der Ergebnisse
 		System.out.printf("Erfolgsrate (richtig klassifizierte Bilder): %.4f%n", erfolgsrate);
+		System.out.printf("Durchschnittlicher Fehler (falsch klassifizierte Bilder): %.4f%n", durchschnittlicherFehler);
 		System.out.printf("Standardabweichung: %.4f%n", standardabweichung);
 		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
+
+		// Pfad zur CSV-Datei
+		String dateiPfad = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse.csv";
+		schreibeStatistikInCsv(dateiPfad, erfolgsrate, durchschnittlicherFehler, standardabweichung, konfidenzintervall);
 	}
 
 	// Methode zur Berechnung der Erfolgsrate (richtig klassifizierte Bilder / alle Bilder)
 	public static double berechneErfolgsrate(int richtig, int gesamt) {
 		return (double) richtig / gesamt;
 	}
-
+	// Methode zur Berechnung des durchschnittlichen Fehlers (falsch klassifizierte Bilder / alle Bilder)
+	public static double berechneDurchschnittlichenFehler(int falsch, int gesamt) {
+		return (double) falsch / gesamt;
+	}
 	// Methode zur Berechnung der Standardabweichung für eine Binomialverteilung
 	public static double berechneStandardabweichung(double erfolgsrate, int gesamt) {
 		return Math.sqrt(erfolgsrate * (1 - erfolgsrate) / gesamt);
@@ -190,5 +199,32 @@ public class Evaluator {
 		obereGrenze = Math.min(1, obereGrenze);
 
 		return new double[]{untereGrenze, obereGrenze};
+	}
+
+	public static void schreibeStatistikInCsv(
+			String dateiPfad,
+			double erfolgsrate,
+			double durchschnittlicherFehler,
+			double standardabweichung,
+			double[] konfidenzintervall) {
+
+		// Format für Datum und Uhrzeit
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm:ss");
+		String zeitstempel = LocalDateTime.now().format(formatter);
+
+		// CSV-Zeile im gewünschten Format erstellen
+		String zeile = String.format("%s, %.4f, %.4f, %.4f, [%.4f, %.4f]%n",
+				zeitstempel, erfolgsrate, durchschnittlicherFehler, standardabweichung,
+				konfidenzintervall[0], konfidenzintervall[1]);
+
+		// Ergebnisse in die CSV-Datei schreiben
+		try (FileWriter writer = new FileWriter(dateiPfad, true)) {
+			// Falls die Datei neu ist, füge die Kopfzeile hinzu
+			writer.write("Datum, Uhrzeit, Erfolgsrate, Durchschnittlicher Fehler, Standardabweichung, Konfidenzintervall\n");
+			writer.write(zeile);
+			System.out.println("Ergebnisse wurden erfolgreich in die CSV-Datei geschrieben.");
+		} catch (IOException e) {
+			System.out.println("Fehler beim Schreiben in die CSV-Datei: " + e.getMessage());
+		}
 	}
 }
