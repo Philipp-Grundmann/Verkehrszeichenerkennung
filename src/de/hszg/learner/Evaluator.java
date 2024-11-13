@@ -9,7 +9,7 @@ import java.util.*;
 public class Evaluator {
 	/** the percentage (between 0 und 100) of vectors from the data to be used for the test, all others are training
 	*/
-	private static int testRate = 40;
+	private static int testRate = 80;
 	/*
 	//Philips Pfade
 	//Datei welche Featurevektoren enthält und eingelesen wird
@@ -42,13 +42,20 @@ public class Evaluator {
 
 		do{
 			vectors = mixData(vectors, i);					//shuffle mit i als Seed
-			List<List<FeatureVector>> sets = extractTrainingData(vectors); //Aufteilung der Featurevektordaten in Test und Trainingsdaten
+			int testdatenmenge=7500;
+			//testdatenmenge=vectors.size()-1;
+			List<FeatureVector> vectors_use = new LinkedList<>(); //Möglichkeit die Anzahl der Testdaten zu verringern
+			vectors_use.addAll(vectors.subList(0,testdatenmenge));
+
+
+			List<List<FeatureVector>> sets = extractTrainingData(vectors_use); //Aufteilung der Featurevektordaten in Test und Trainingsdaten
 
 			Vector<Integer> result_lern=new Vector<>();		//Vektor mit Werten bezüglich des Lernprozesses
-			result_lern.add(0, vectors.size());		//Vektor 0 = Gesamtanzahl aller Datensätze
+			result_lern.add(0, vectors_use.size());	//Vektor 0 = Gesamtanzahl aller Datensätze
 			result_lern.add(1, sets.get(0).size());	//Vektor 1 = Anzahl der Trainingsdaten
 			result_lern.add(2, sets.get(1).size());	//Vektor 2 = Anzahl der Testdaten
-			result_lern.add(3,i);						//Vektor 3 = N eines Durchganges
+			result_lern.add(3, i);					//Vektor 3 = N eines Durchganges
+			//result_lern.add(4,testdatenmenge); 			//Unnötig da bereits in Vektor 0 hinterlegt
 
 
 			learner.learn(sets.get(0));
@@ -56,7 +63,7 @@ public class Evaluator {
 			evalResult(result_lern, result_classify);
 
 			i++;
-		}while(i<3); //TODO: eine andere Abbruchbedingung verwenden
+		}while(i<10); //TODO: eine andere Abbruchbedingung verwenden
 
 
 
@@ -72,11 +79,13 @@ public class Evaluator {
 
 		// Angenommene Werte für richtig, falsch und unbekannt klassifizierte Bilder
 		int richtig = result_classify.get(0);  // Beispielwert für richtig klassifizierte Bilder
-		int falsch = result_classify.get(1);    // Beispielwert für falsch klassifizierte Bilder
-		int unbekannt = result_classify.get(2); // Beispielwert für unbekannt klassifizierte Bilder
+		int unbekannt = result_classify.get(1); // Beispielwert für unbekannt klassifizierte Bilder
+		int falsch = result_classify.get(2);    // Beispielwert für falsch klassifizierte Bilder
+
 
 		// Gesamtanzahl der Bilder berechnen
 		int gesamt = richtig + falsch + unbekannt;
+
 		if (gesamt == 0) {
 			System.out.println("Die Gesamtanzahl der Bilder darf nicht 0 sein.");
 			return;
@@ -87,18 +96,18 @@ public class Evaluator {
 
 		// Berechnungen
 		double erfolgsrate = berechneErfolgsrate(richtig, gesamt);
-		double durchschnittlicherFehler = berechneDurchschnittlichenFehler(falsch, gesamt);
+		double beispielFehler = berechneBeispielFehler(falsch+unbekannt, gesamt);
 		double standardabweichung = berechneStandardabweichung(erfolgsrate, gesamt);
 		double[] konfidenzintervall = berechneKonfidenzintervall(erfolgsrate, zWert, standardabweichung);
 
 		// Ausgabe der Ergebnisse
 		System.out.printf("Erfolgsrate (richtig klassifizierte Bilder): %.4f%n", erfolgsrate);
-		System.out.printf("Durchschnittlicher Fehler (falsch klassifizierte Bilder): %.4f%n", durchschnittlicherFehler);
+		System.out.printf("Beispiel-Fehler (falsch klassifizierte Bilder): %.4f%n", beispielFehler);
 		System.out.printf("Standardabweichung: %.4f%n", standardabweichung);
 		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
 
 		// Pfad zur CSV-Datei ist in Klasse globale definiert
-		schreibeStatistikInCsv(filename_results_statistics,result_lern,gesamt, erfolgsrate, durchschnittlicherFehler, standardabweichung, konfidenzintervall);
+		schreibeStatistikInCsv(filename_results_statistics,result_lern, erfolgsrate, beispielFehler, standardabweichung, konfidenzintervall);
 
 	}
 	/** evaluate the learner with a given test set. 
@@ -188,9 +197,9 @@ public class Evaluator {
 		return (double) richtig / gesamt;
 	}
 
-	// Methode zur Berechnung des durchschnittlichen Fehlers (falsch klassifizierte Bilder / alle Bilder)
-	public static double berechneDurchschnittlichenFehler(int falsch, int gesamt) {
-		return (double) falsch / gesamt;
+	// Methode zur Berechnung des durchschnittlichen Fehlers bzw. Beispiel-Fehler (falsch klassifizierte Bilder / alle Bilder)
+	public static double berechneBeispielFehler(int falsch, int gesamt) {
+		return (1.0/gesamt)*falsch;
 	}
 
 	// Methode zur Berechnung der Standardabweichung für eine Binomialverteilung
@@ -213,7 +222,6 @@ public class Evaluator {
 	public static void schreibeStatistikInCsv(
 			String dateiPfad,
 			Vector<Integer> result_lern,
-			int gesamtanzahl, //Addition aller Auswertedaten
 			double erfolgsrate,
 			double durchschnittlicherFehler,
 			double standardabweichung,
@@ -224,9 +232,9 @@ public class Evaluator {
 		String zeitstempel = LocalDateTime.now().format(formatter);
 
 		// CSV-Zeile im gewünschten Format erstellen
-		String zeile = String.format("%s; %d; %d; %d; %d; %d; %.4f; %.4f; %.4f; [%.4f; %.4f]%n",
+		String zeile = String.format("%s; %d; %d; %d; %d; %.4f; %.4f; %.4f; %.4f; %.4f %n",
 				zeitstempel,
-				result_lern.get(0),gesamtanzahl,result_lern.get(1), result_lern.get(2), result_lern.get(3),
+				result_lern.get(0),result_lern.get(1), result_lern.get(2), result_lern.get(3),
 				erfolgsrate, durchschnittlicherFehler, standardabweichung,
 				konfidenzintervall[0], konfidenzintervall[1]);
 
@@ -240,11 +248,10 @@ public class Evaluator {
 				// Falls die Datei neu ist, schreibe die Kopfzeile
 				if (istDateiNeu) {
 					//writer.write("Datum; Uhrzeit; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
-					writer.write("Datum; Uhrzeit;Gesamtanzahl; Gesamtanzahl_Add; Anz_Trainingsdaten; Anz_Testdaten; n-Runde; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
+					writer.write("Datum; Uhrzeit;Gesamtanzahl; Anz_Trainingsdaten; Anz_Testdaten; n-Runde; Erfolgsrate; Beispiel-Fehler; Standardabweichung; Konfidenzintervall-Unten; Konfidenzintervall-Oben; \n");
 				}
 				// Schreibe die Datenzeile
 				writer.write(zeile);
-
 				System.out.println("Ergebnisse wurden erfolgreich in die CSV-Datei geschrieben.");
 			}
 		} catch (IOException e) {
