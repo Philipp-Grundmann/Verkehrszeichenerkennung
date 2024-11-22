@@ -23,7 +23,7 @@ public class LazyLerningKNN_Lerner implements Learner {
     }
 
     @Override
-    public Concept classify(FeatureVector example) {
+    public Vector<Concept> classify(FeatureVector example) {
         // Hier wird die Klassifizierung basierend auf den k nächsten Nachbarn durchgeführt
 
         List<Distance> distances = new ArrayList<>();
@@ -52,7 +52,9 @@ public class LazyLerningKNN_Lerner implements Learner {
             }
         }
 
-        return Concept.values()[bestClassIndex];
+        Vector<Concept> res = new Vector<>();
+        res.addFirst(Concept.values()[bestClassIndex]);
+        return res;
     }
 
     private double calculateDistance(FeatureVector fv1, FeatureVector fv2) {

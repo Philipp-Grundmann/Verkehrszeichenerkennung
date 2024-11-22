@@ -22,4 +22,13 @@ public interface FeatureVector extends Serializable{
 	double getFeatureValue(int i);
 
 	String getPrintVektorValue();
+
+	double[] getFeatureVektor();
+
+    boolean[] getArrayOfConcept();
+	int getSizePerImage();
+
+	int getGridCols();
+	int getGridRows();
+
 }

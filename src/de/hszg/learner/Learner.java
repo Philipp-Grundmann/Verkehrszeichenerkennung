@@ -16,7 +16,7 @@ public interface Learner {
 	 * this method must not consider example.getConcept() at all!!
 	 * 
 	 * @param example: is a feature vector
-	 * @return the concept of the examplke as learned by this before
+	 * @return Array of Concepts; erster Wert ermitteltes Concept;
 	 */
-	Concept classify(FeatureVector example);
+	Vector<Concept> classify(FeatureVector example);
 }

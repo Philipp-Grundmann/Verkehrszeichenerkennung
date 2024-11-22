@@ -17,19 +17,24 @@ public class ImageProcessor {
     boolean save_corner_Marker=false;
 
     // Rasterparameter definieren
-    int gridRows = 5; // Anzahl der Zeilen
-    int gridCols = 5; // Anzahl der Spalten
-    int CountFields=gridCols*gridRows;
+    int gridRows; // Anzahl der Zeilen
+    int gridCols; // Anzahl der Spalten
+    int CountFields;
 
     int corner=0;
-    double[] AlleFarbvektoren=new double[CountFields];
+    double[] AlleFarbvektoren;
     Concept c; //Concept des Bildes
 
     FeatureVector Output_Vektor;
 
-
     //Constuructor MAT als Input -> Ziel: Alle Feature Vektoren als Output
-    ImageProcessor(Mat image, Concept concept){
+    ImageProcessor(Mat image, Concept concept,int gridCols, int gridRows){
+
+        this.gridRows=gridRows;
+        this.gridCols=gridCols;
+        CountFields=gridCols*gridRows;
+        AlleFarbvektoren=new double[CountFields];
+
         c=concept;
         if (image == null) {
             return; //nur zur sicherheit
@@ -78,8 +83,9 @@ public class ImageProcessor {
         AlleFarbvektoren= analyzeImageInGrid(croppedImage, gridRows, gridCols);
         //ToDo Analyze Image Grid
 
-        Output_Vektor=new MyFeatureVector(corner,AlleFarbvektoren,c);
+        //Output_Vektor=new MyFeatureVector(corner,AlleFarbvektoren,c);
 
+        Output_Vektor=new MyFeatureVector(AlleFarbvektoren, c,gridRows,gridCols );
 
         // Merkmalsvektor speichern
         // CloseFeatureVector("feature_vectors.csv");

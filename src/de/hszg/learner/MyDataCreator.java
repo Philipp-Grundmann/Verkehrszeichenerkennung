@@ -37,13 +37,13 @@ public class MyDataCreator {
 			System.out.println("DummyDataCreator: Could not create DummyData.dat");
 			t.printStackTrace();
 		}*/
-		saveManyFeatureVektores(f, "C:\\3500");
+		saveManyFeatureVektores(f, "C:\\3500","DEMO");
 
 	}
 
 
 	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
-	MyDataCreator(String FolderPathnameImages, String FolderPathnameData){
+	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, int gridCols, int gridRows){
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
 		// Verarbeite alle Bilder in einem Ordner
@@ -51,7 +51,8 @@ public class MyDataCreator {
 		//File[] listOfFiles = folder.listFiles();
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
-		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
+		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 2);
 		int sum=fileToConceptMap.size();
 		int progress=0;
 
@@ -74,7 +75,7 @@ public class MyDataCreator {
 
 					if (!image.empty()) {
 						// Bild wird verarbeitet und Featurevektor wird der Liste hinzugefügt
-						ImageProcessor myImageProcessor = new ImageProcessor(image,concept);
+						ImageProcessor myImageProcessor = new ImageProcessor(image,concept,gridCols,gridRows);
 						FeatureVector myFeatureVector = myImageProcessor.getOutput_Vektor();
 						System.out.println("Ausgabe Vektor: ");
 						//System.out.print(myFeatureVector.getPrintVektorValue());
@@ -86,8 +87,10 @@ public class MyDataCreator {
 					}
 		}
 
+		String nametag="_S"+gridCols+"xZ"+gridRows;
+
 		//Schreibt alle Featurevektoren in eine .dat-Datei
-		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), FolderPathnameData);
+		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), FolderPathnameData, nametag);
 		
 		
 		//FolderPathenameData in ausgewählen Lerner laden/lernen
@@ -177,6 +180,9 @@ public class MyDataCreator {
 	private static void loadFilesRecursiv(File folder, List<File> filesList, int maxFiles) {
 		File[] subFiles = folder.listFiles();
 
+		subFiles=shuffleArrayWithSeed(subFiles, 6438);
+
+
 		// Prüfen, ob der aktuelle Ordner ein Blatt-Ordner ist (keine Unterordner)
 		if (subFiles != null && containsOnlyFiles(subFiles)) {
 			int fileCount = 0;
@@ -236,8 +242,8 @@ public class MyDataCreator {
 		return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".bmp");
 	}
 
-	public void saveManyFeatureVektores(FeatureVector[] ArrayOfAllFeaturevektores,String FolderPathnameData) {
-		String filename = FolderPathnameData+"\\VektorData"+generateDateTimeforFilename()+".dat";
+	public void saveManyFeatureVektores(FeatureVector[] ArrayOfAllFeaturevektores,String FolderPathnameData, String nametag) {
+		String filename = FolderPathnameData+"\\VektorData"+generateDateTimeforFilename()+nametag+".dat";
 
 		List<FeatureVector> res = new LinkedList<>();
 		for(FeatureVector fv : ArrayOfAllFeaturevektores) res.add(fv);
@@ -251,12 +257,26 @@ public class MyDataCreator {
 		}
 	}
 
+	/*
+	public static File[] shuffleArrayWithSeed(File[] files, int RandomSeed) {
+		List<File> files_list= new ArrayList<>(Arrays.stream(files).toList());
+		Collections.shuffle(files_list, new Random(RandomSeed));
+		return (File[]) files_list.toArray();
+	}*/
+
+
+	public static File[] shuffleArrayWithSeed(File[] files, int randomSeed) {
+		List<File> filesList = new ArrayList<>(Arrays.asList(files));
+		Collections.shuffle(filesList, new Random(randomSeed));
+		return filesList.toArray(new File[0]);
+	}
+
 
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500");  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,3);  //Testdaten erstellen - hat funktioniert
 		//new MyDataCreator(); //DummyData Creater
 	}
 }
