@@ -52,7 +52,7 @@ public class MyDataCreator {
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
-		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 2);
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
 		int sum=fileToConceptMap.size();
 		int progress=0;
 
@@ -276,7 +276,16 @@ public class MyDataCreator {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 2,2);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,3);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,4);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,5);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 7,7);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 10,10);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,3);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,4);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,5);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,3);  //Testdaten erstellen - hat funktioniert
 		//new MyDataCreator(); //DummyData Creater
 	}
 }
