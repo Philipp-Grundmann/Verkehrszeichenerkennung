@@ -23,7 +23,7 @@ public class Evaluator {
 	//Markus Pfade
 	//Datei welche Featurevektoren enthält und eingelesen wird
 	//static String filename_feature_vektor ="C:\\Code\\Daten\\VektorData_20241030_011840.dat";
-	static String filename_feature_vektor ="C:\\Code\\Daten\\VektorData_20241122_190724_S3xZ3.dat";
+	static String filename_feature_vektor ="C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5";
 
 	//Datei in welche die Ergebnisse einer Laufzeit eingelesen werden
 	//String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse_"+MyDataCreator.generateDateTimeforFilename()+".csv";
@@ -37,7 +37,7 @@ public class Evaluator {
 
 		//String filename_feature_vektor ="C:\\Code\\Daten\\VektorData_20241030_011840.dat";
 
-		List<FeatureVector> vectors = readData(filename_feature_vektor);
+		List<FeatureVector> vectors = readData(filename);
 		//Learner learner = new LazyLerningKNN_Lerner(3);
 		Learner learner = new NeuronalesNetzwerkLearner(vectors.getFirst().getSizePerImage());
 
@@ -49,8 +49,8 @@ public class Evaluator {
 		do{
 			vectors = mixData(vectors, i);					//shuffle mit i als Seed
 			//int testdatenmenge=7500;
-			int testdatenmenge=1000;
-			//testdatenmenge=vectors.size()-1;
+			//int testdatenmenge=1000;
+			int testdatenmenge=vectors.size()-1;
 
 
 			if (testdatenmenge > (vectors.size()-1)) { //Zur Sicherheit falls zu wenig Daten vorhanden
@@ -77,7 +77,7 @@ public class Evaluator {
 			evalResult(result_static, result_classify, result_lern);
 
 			i++;
-		}while(i<10); //TODO: eine andere Abbruchbedingung verwenden
+		}while(i<100); //TODO: eine andere Abbruchbedingung verwenden
 
 
 
@@ -203,8 +203,22 @@ public class Evaluator {
 	 */
 	public static void main(String[] args){
 		//filename_feature_vektor ist als static String innerhalb der Klasse definiert
-		new Evaluator(filename_feature_vektor);
-/*
+		//String filename= "C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5.dat";
+		//String filename= "C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5";
+
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241122_202106_S2xZ2.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241122_210952_S3xZ3.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241122_215836_S4xZ4.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241122_233608_S7xZ7.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_002424_S10xZ10.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_011239_S15xZ15.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_020045_S4xZ3.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_024852_S3xZ4.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_033655_S3xZ5.dat");
+		new Evaluator("C:\\Code\\Daten\\Evaulation\\VektorData_20241123_042455_S5xZ3.dat");
+
+/*		Testcode für Concept to Bit
 		System.out.println("Concept in Bit: ");
 		System.out.println("Concept: "+Concept.Unknown.toString()+" Bitfolge: "+ Arrays.toString(NeuronalesNetzwerkLearner.ConceptToOutputArray(Concept.Unknown)));
 		System.out.println("Concept: "+Concept.Vorfahrt_von_Rechts.toString()+" Bitfolge: "+ Arrays.toString(NeuronalesNetzwerkLearner.ConceptToOutputArray(Concept.Vorfahrt_von_Rechts)));
@@ -276,7 +290,7 @@ public class Evaluator {
 				if (istDateiNeu) {
 					//writer.write("Datum; Uhrzeit; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
 					writer.write("Datum; Uhrzeit;Gesamtanzahl; Anz_Trainingsdaten; Anz_Testdaten; n-Runde; Erfolgsrate; Beispiel-Fehler; Standardabweichung; Konfidenzintervall-Unten; Konfidenzintervall-Oben;" +
-							"Anz_Trainingsdaten; Anz_Epoch; Anz_Vektoren; Anz_IMGVectoren; Anz_GridCols; Anz_GridRows\n");
+							"Anz_Trainingsdaten; Anz_Epoch; Anz_Perceptron; Anz_IMGVectoren; Anz_GridCols; Anz_GridRows\n");
 				}
 				// Schreibe die Datenzeile
 				writer.write(zeile);

@@ -282,6 +282,7 @@ public class MyDataCreator {
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,5);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 7,7);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 10,10);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 15,15);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,3);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,4);  //Testdaten erstellen - hat funktioniert
 		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,5);  //Testdaten erstellen - hat funktioniert

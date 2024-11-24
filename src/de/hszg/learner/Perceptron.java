@@ -40,41 +40,9 @@ public class Perceptron {
         return sum;
     }
 
-    //Funktion welche Perzeoptron trainiert
-    public void traing(FeatureVector f, int Ausgabe) {
-        int i=0; //Kontrollierbarer Wert für Anzahl der Lerndurchgänge damit es vergleichbar bleibt;
-
-        //Lernalgorithmus nach Papert69
-        do{
-            
-            for (int j=0;j<f.getNumFeatures();j++){
-                if (output(f)&&weights[j]*f.getFeatureValue(j)<=0) {
-                    weights[j]=weights[j]+f.getFeatureValue(j);
-                } else if (!output(f)&&weights[j]*f.getFeatureValue(j)<0) {
-                    
-                }
-
-
-            }
-                
-
-
-
-            i++;
-        }while(i<100);
-
-
-    }
-
     public void train(FeatureVector f, boolean target) {
         int output = booleanToInt(output(f));   //Berechnung des Perzeptrons-Outputs
         int error = booleanToInt(target) - output;            //Angenommener Ziel - Berechneter output
-        // 0 opder 1
-        // Ziel z.B. 1 minus 1 = 0 Richig -> keine Anpassung erforderlcih
-        //Ziel z.B. 0 minus 0 = 0 Richtig -> keine Anpassung
-        //Ziel 1 minus 0 = 1 Falsch - Output zu niedrig
-        // Ziel 0 minus 1 = -1 Falsch - Output zu hoch
-
 
         // Gewichte und Bias aktualisieren (Minsky-Papert-Regel)
         for (int i = 0; i < weights.length-1; i++) {
