@@ -121,7 +121,7 @@ public class Evaluator {
 		System.out.printf("Konfidenzintervall: [%.4f, %.4f]%n", konfidenzintervall[0], konfidenzintervall[1]);
 
 		// Pfad zur CSV-Datei ist in Klasse globale definiert
-		schreibeStatistikInCsv(filename_results_statistics,result_static, erfolgsrate, beispielFehler, standardabweichung, konfidenzintervall, result_lern);
+		schreibeStatistikInCsv(filename_results_statistics,result_static, erfolgsrate, beispielFehler, standardabweichung, konfidenzintervall, result_lern, result_classify);
 
 	}
 	/** evaluate the learner with a given test set. 
@@ -133,17 +133,79 @@ public class Evaluator {
 	 */
 	 private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		int success=0;int unknown=0;int fault =0;
+		int ges_stop=0; int suc_stop=0;
+		int ges_vorr=0; int suc_vorr=0;
+		int ges_vorg=0; int suc_vorg=0;
+		int ges_fal=0; int suc_fal=0;
+		int ges_far=0; int suc_far=0;
+		int ges_vorf=0; int suc_vorf=0;
+
 		for(FeatureVector fv : list){
 			Concept c = learner.classify(fv).get(0);
 			if(c.equals(Concept.Unknown)) unknown++;
 			else if(c.equals(fv.getConcept())) success++;
 			else fault++;
-				
+
+			if (fv.getConcept().equals(Concept.Stoppschild)) {
+				ges_stop++;
+				if (c.equals(Concept.Stoppschild)) {
+					suc_stop++;
+				}
+			}
+
+			if (fv.getConcept().equals(Concept.Vorfahrt_von_Rechts)) {
+				ges_vorr++;
+				if (c.equals(Concept.Vorfahrt_von_Rechts)) {
+					suc_vorr++;
+				}
+			}
+
+			if (fv.getConcept().equals(Concept.Vorfahrt_gewähren)) {
+				ges_vorg++;
+				if (c.equals(Concept.Vorfahrt_gewähren)) {
+					suc_vorg++;
+				}
+			}
+
+			if (fv.getConcept().equals(Concept.Fahrtrichtung_links)) {
+				ges_fal++;
+				if (c.equals(Concept.Fahrtrichtung_links)) {
+					suc_fal++;
+				}
+			}
+
+			if (fv.getConcept().equals(Concept.Fahrtrichtung_rechts)) {
+				ges_far++;
+				if (c.equals(Concept.Fahrtrichtung_rechts)) {
+					suc_far++;
+				}
+			}
+
+			if (fv.getConcept().equals(Concept.Vorfahrtsstraße)) {
+				ges_vorf++;
+				if (c.equals(Concept.Vorfahrtsstraße)) {
+					suc_vorf++;
+				}
+			}
 		}
 		Vector<Integer> res = new Vector<>();
 		res.add(0,success);
 		res.add(1,unknown);
 		res.add(2,fault);
+		res.add(3,suc_stop);
+		res.add(4,suc_vorr);
+		res.add(5,suc_vorg);
+		res.add(6,suc_fal);
+		res.add(7,suc_far);
+		res.add(8,suc_vorf);
+		 res.add(9,ges_stop);
+		 res.add(10,ges_vorr);
+		 res.add(11,ges_vorg);
+		 res.add(12,ges_fal);
+		 res.add(13,ges_far);
+		 res.add(14,ges_vorf);
+
+
 		return res;
 	}
 /**
@@ -264,7 +326,8 @@ public class Evaluator {
 			double durchschnittlicherFehler,
 			double standardabweichung,
 			double[] konfidenzintervall,
-			Vector<Integer> result_lern
+			Vector<Integer> result_lern,
+			Vector<Integer> result_classify
 			) {
 
 		// Format für Datum und Uhrzeit
@@ -272,12 +335,20 @@ public class Evaluator {
 		String zeitstempel = LocalDateTime.now().format(formatter);
 
 		// CSV-Zeile im gewünschten Format erstellen
-		String zeile = String.format("%s; %d; %d; %d; %d; %.4f; %.4f; %.4f; %.4f; %.4f; %d; %d; %d; %d; %d; %d; %d; %n",
+		String zeile = String.format("%s; %d; %d; %d; %d; %.4f; %.4f; %.4f; %.4f; %.4f; %d; %d; %d; %d; %d; %d; %.4f; %.4f;%.4f; %.4f;%.4f; %.4f; %n",
 				zeitstempel,
 				result_static.get(0),result_static.get(1), result_static.get(2), result_static.get(3),
 				erfolgsrate, durchschnittlicherFehler, standardabweichung,
 				konfidenzintervall[0], konfidenzintervall[1],
-				result_lern.get(0), result_lern.get(1),  result_lern.get(2), result_lern.get(3), result_lern.get(4), result_lern.get(5), result_lern.get(6));
+				result_lern.get(0), result_lern.get(1),  result_lern.get(2), result_lern.get(3),
+				//result_lern.get(4), Wert wird nicht benötigt war nur Test ob wert identisch
+				result_lern.get(5), result_lern.get(6),
+				berechneErfolgsrate(result_classify.get(3),result_classify.get(9)),
+				berechneErfolgsrate(result_classify.get(4),result_classify.get(10)),
+				berechneErfolgsrate(result_classify.get(5),result_classify.get(11)),
+				berechneErfolgsrate(result_classify.get(6),result_classify.get(12)),
+				berechneErfolgsrate(result_classify.get(7),result_classify.get(13)),
+				berechneErfolgsrate(result_classify.get(8),result_classify.get(14)));
 
 		try {
 			// Überprüfen, ob die Datei existiert
@@ -290,7 +361,8 @@ public class Evaluator {
 				if (istDateiNeu) {
 					//writer.write("Datum; Uhrzeit; Erfolgsrate; Durchschnittlicher Fehler; Standardabweichung; Konfidenzintervall\n");
 					writer.write("Datum; Uhrzeit;Gesamtanzahl; Anz_Trainingsdaten; Anz_Testdaten; n-Runde; Erfolgsrate; Beispiel-Fehler; Standardabweichung; Konfidenzintervall-Unten; Konfidenzintervall-Oben;" +
-							"Anz_Trainingsdaten; Anz_Epoch; Anz_Perceptron; Anz_IMGVectoren; Anz_GridCols; Anz_GridRows\n");
+							"Anz_Trainingsdaten; Anz_Epoch; Anz_Perceptron; Anz_IMGVectoren; Anz_GridCols; Anz_GridRows;" +
+							"Erf_Stop; Erf_VorVrechts; Erf_VorVgewahren; Erf_FahrLinks; Erf_FahrRechts; Erf_Vorfahrsstr\n");
 				}
 				// Schreibe die Datenzeile
 				writer.write(zeile);

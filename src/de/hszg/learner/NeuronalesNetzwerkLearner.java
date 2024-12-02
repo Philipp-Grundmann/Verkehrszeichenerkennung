@@ -21,6 +21,7 @@ public class NeuronalesNetzwerkLearner implements Learner{
     @Override
     public Vector<Integer> learn(List<FeatureVector> trainingSet) {
         int epochs= 400;
+
         for ( int i = 0; i < epochs; i++) {  //Anzahl der Durchgänge
             for (int j = 0; j < trainingSet.size(); j++) { //Für jedes Bild
                 FeatureVector input = trainingSet.get(j);
