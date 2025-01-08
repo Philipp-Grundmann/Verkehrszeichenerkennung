@@ -22,14 +22,15 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="opencv-4100" level="project" />
+    <orderEntry type="library" exported="" name="opencv-4100" level="project" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Maschinelles Lernen/smile-4.0.0/lib/com.github.haifengl.smile-core-4.0.0.jar!/" />
+          <root url="file://$MODULE_DIR$/../../../Maschinelles Lernen/smile-4.0.0/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../../../Maschinelles Lernen/smile-4.0.0/lib" recursive="false" />
       </library>
     </orderEntry>
   </component>
