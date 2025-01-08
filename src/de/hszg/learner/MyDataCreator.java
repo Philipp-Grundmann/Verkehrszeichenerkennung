@@ -52,7 +52,7 @@ public class MyDataCreator {
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
-		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 500);
 		int sum=fileToConceptMap.size();
 		int progress=0;
 
@@ -154,26 +154,6 @@ public class MyDataCreator {
 				return Concept.Unknown;
 		}
 	}
-
-	/*
-	//Läd rekursiv die zu verarbeitenden Dateien aus einem Verzeichnis
-	private static void loadFilesRecursively(File folder, List<File> filesList, int maxFiles) {
-		if (maxFiles != -1 && filesList.size() >= maxFiles) return;
-
-
-
-		File[] files = folder.listFiles();
-		if (files != null) {
-			for (File file : files) {
-				if (file.isDirectory()) {
-					loadFilesRecursively(file, filesList, maxFiles);
-				} else {
-					filesList.add(file);
-					if (maxFiles != -1 && filesList.size() >= maxFiles) break;
-				}
-			}
-		}
-	} */
 
 
 

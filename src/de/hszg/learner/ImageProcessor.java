@@ -273,7 +273,7 @@ public class ImageProcessor {
                 colorCounts.put("Schwarz", colorCounts.get("Schwarz") + 1);
             } else if (isWhite(red, green, blue)) {
                 colorCounts.put("Weiß", colorCounts.get("Weiß") + 1);
-            };
+            }
         } else {
             // dark color
             if (isRed(red, green, blue)) {
@@ -286,7 +286,7 @@ public class ImageProcessor {
                 colorCounts.put("Schwarz", colorCounts.get("Schwarz") + 1);
             } else if (isWhite(red, green, blue)) {
                 colorCounts.put("Weiß", colorCounts.get("Weiß") + 1);
-            };
+            }
         }
     }
 
@@ -366,11 +366,6 @@ public class ImageProcessor {
     private static boolean isWhite(int red, int green, int blue) {
         return red > 200 && green > 200 && blue > 200;
     }
-
-
-
-
-
 
 
     FeatureVector getOutput_Vektor(){
