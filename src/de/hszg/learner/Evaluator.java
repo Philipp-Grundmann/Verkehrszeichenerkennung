@@ -10,24 +10,19 @@ public class Evaluator {
 	/** the percentage (between 0 und 100) of vectors from the data to be used for the test, all others are training
 	*/
 	private static int testRate = 60;
-	/*
-	//Philips Pfade
+
+
+	
+	//Philipps Pfade
 	//Datei welche Featurevektoren enthält und eingelesen wird
 	static String filename_feature_vektor ="C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\VektorData_20241030_105858.dat";
 
 	//Datei in welche die Ergebnisse einer Laufzeit eingelesen werden
 	//String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse_"+MyDataCreator.generateDateTimeforFilename()+".csv";
 	String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebniss.csv";
-*/
 
-	//Markus Pfade
-	//Datei welche Featurevektoren enthält und eingelesen wird
-	//static String filename_feature_vektor ="C:\\Code\\Daten\\VektorData_20241030_011840.dat";
-	static String filename_feature_vektor ="C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5";
 
-	//Datei in welche die Ergebnisse einer Laufzeit eingelesen werden
-	//String filename_results_statistics = "C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\ergebnisse_"+MyDataCreator.generateDateTimeforFilename()+".csv";
-	String filename_results_statistics = "C:\\Code\\Daten\\ergebniss.csv";
+
 
 
 
