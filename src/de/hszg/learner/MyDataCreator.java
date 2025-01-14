@@ -16,30 +16,7 @@ public class MyDataCreator {
 
 	private static final String filename = "DummyData"+generateDateTimeforFilename()+".dat";
 
-	/**
-	 * Constuctor für DummyDaten
-	 */
-	MyDataCreator(){
-		double[] ColorArray = new double[125];
-		int DummyCorner = 1;
 
-		FeatureVector[] f = new FeatureVector[6];
-		f[0] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-
-		/*
-		List<FeatureVector> res = new LinkedList<>();
-		for(FeatureVector fv : f) res.add(fv);
-		try{
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
-			out.writeObject(res);
-			out.close();
-		}catch(Throwable t){
-			System.out.println("DummyDataCreator: Could not create DummyData.dat");
-			t.printStackTrace();
-		}*/
-		saveManyFeatureVektores(f, "C:\\3500","DEMO");
-
-	}
 
 
 	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
@@ -47,8 +24,8 @@ public class MyDataCreator {
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
 		// Verarbeite alle Bilder in einem Ordner
-		//File folder = new File(FolderPathnameImages);
-		//File[] listOfFiles = folder.listFiles();
+		File folder = new File(FolderPathnameImages);
+		File[] listOfFiles = folder.listFiles();
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
@@ -143,12 +120,12 @@ public class MyDataCreator {
 
 	public static Concept mainFolderName_StrToConcept(String MainFolderName){
 		switch (MainFolderName){
-			case "209 - Fahrtrichtung links": 	return Concept.Fahrtrichtung_links;
-			case "306 - Vorfahrtsstrasse": 		return Concept.Vorfahrtsstraße;
-			case "206 - Stop": 					return Concept.Stoppschild;
-			case "205 - Vorfahrt gewaehren": 	return  Concept.Vorfahrt_gewähren;
-			case "209 - Fahrtrichtung rechts":	return Concept.Fahrtrichtung_rechts;
-			case "102 - Vorfahrt von rechts":	return Concept.Vorfahrt_von_Rechts;
+			case "FAHRTRICHTUNG_LINKS": 	return Concept.Fahrtrichtung_links;
+			case "VORFAHRTSSTRASSE": 		return Concept.Vorfahrtsstraße;
+			case "STOP": 					return Concept.Stoppschild;
+			case "VORFAHRT_GEWAEHREN": 		return  Concept.Vorfahrt_gewähren;
+			case "FAHRTRICHTUNG_RECHTS":	return Concept.Fahrtrichtung_rechts;
+			case "VORFAHRT_VON_RECHTS":		return Concept.Vorfahrt_von_Rechts;
 			default:
 				System.out.println("Das Verkehrszeichen konnte nicht Identifiziert werden!");
 				return Concept.Unknown;
@@ -256,17 +233,7 @@ public class MyDataCreator {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 2,2);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,3);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,4);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,5);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 7,7);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 10,10);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 15,15);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,3);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,4);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,5);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,3);  //Testdaten erstellen - hat funktioniert
-		//new MyDataCreator(); //DummyData Creater
+		new MyDataCreator("C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichen","C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichenerkennung\\ergebnisse 14.01.2025", 7,7);
+
 	}
 }
