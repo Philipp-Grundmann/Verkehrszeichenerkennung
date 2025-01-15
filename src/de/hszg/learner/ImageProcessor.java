@@ -50,35 +50,6 @@ public class ImageProcessor {
             saveImage("C:\\temp\\cropped_image"+MyDataCreator.generateDateTimeforFilename()+".bmp", croppedImage);
         }
 
-        //
-        //Eckenerkennung, mit Mitteln von OpenCV auf Graustufenbild
-        //
-        /*
-        Mat grayImage = convertToGrayscale(croppedImage); // Bild in Graustufen konvertieren
-        Mat edges = detectEdgesWithCanny(grayImage, 100, 200); // Kanten mit Canny-Edge-Detection erkennen
-        MatOfPoint cornersMatOfPoint = detectCorners(edges, 100, 0.3, 300); // Eckenerkennung basierend auf den Kanten
-        Point[] cornerPoints = cornersMatOfPoint.toArray();
-        corner=cornerPoints.length; //Erkannt
-         */
-        //TODO Erkennung überarbeiten
-        corner=0;
-
-        //System.out.println("Anzahl erkannter ecken: "+corner);
-
-        // Anzahl der erkannten Ecken ausgeben
-        //printCornerCount(cornersMatOfPoint,"feature_vectors.csv");
-
-
-        if (save_corner_Marker) {
-            //Ecken in Bild markieren
-           // for (Point corner : cornerPoints) {
-            //    Imgproc.circle(croppedImage, corner, 5, new Scalar(0, 0, 255), 2);  // Ecken rot markieren
-           // }
-
-            // Ausgabe des Bildes mit eingezeichneten Ecken
-            saveImage("C:\\temp\\corner_image"+MyDataCreator.generateDateTimeforFilename()+".bmp", croppedImage);
-        }
-
         // Bildgröße und Raster analysieren (normalizedImage, gridRows, gridCols)
         AlleFarbvektoren= analyzeImageInGrid(croppedImage, gridRows, gridCols);
         //ToDo Analyze Image Grid
@@ -167,27 +138,7 @@ public class ImageProcessor {
         System.out.println("Bild wurde gespeichert unter: " + outputPath);
     }
 
-    public static Mat convertToGrayscale(Mat image) {
-        Mat grayImage = new Mat();
-        Imgproc.cvtColor(image, grayImage, Imgproc.COLOR_BGR2GRAY);
-        return grayImage;
-    }
-
-    // Canny-Kantenerkennung
-    public static Mat detectEdgesWithCanny(Mat grayImage, int lowThreshold, int highThreshold) {
-        Mat edges = new Mat();
-        Imgproc.Canny(grayImage, edges, lowThreshold, highThreshold);
-        return edges;
-    }
-
-    // Ecken mit Shi-Tomasi Corner Detection erkennen
-    public static MatOfPoint detectCorners(Mat edges, int maxCorners, double qualityLevel, double minDistance) {
-        MatOfPoint corners = new MatOfPoint();
-        Imgproc.goodFeaturesToTrack(edges, corners, maxCorners, qualityLevel, minDistance);
-        return corners;
-    }
-
-    // Rasterbildanalyse mit OpenCV
+      // Rasterbildanalyse mit OpenCV
     private static double[] analyzeImageInGrid(Mat image, int gridRows, int gridCols) {
         int width = image.width();
         int height = image.height();

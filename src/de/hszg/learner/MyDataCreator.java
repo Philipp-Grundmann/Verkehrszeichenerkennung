@@ -1,9 +1,6 @@
 package de.hszg.learner;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -14,9 +11,26 @@ import org.opencv.imgcodecs.Imgcodecs;
 
 public class MyDataCreator {
 
-	private static final String filename = "DummyData"+generateDateTimeforFilename()+".dat";
+	public static void main(String[] args) {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-
+		/*//Pfad Philipp Laptop
+		new MyDataCreator(
+				"C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichen",
+				"C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichenerkennung\\ergebnisse 14.01.2025",
+				7,7);*/
+		//Pfad Philipp Festrechner
+		new MyDataCreator(
+				"D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen",
+				".\\ergebnisse",
+				7,7);
+		//Pfad Vincent
+		/*new MyDataCreator(
+				"C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichen",
+				"C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichenerkennung\\ergebnisse 14.01.2025",
+				7,7);*/
+	}
 
 
 	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
@@ -24,8 +38,8 @@ public class MyDataCreator {
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
 		// Verarbeite alle Bilder in einem Ordner
-		File folder = new File(FolderPathnameImages);
-		File[] listOfFiles = folder.listFiles();
+		//File folder = new File(FolderPathnameImages);
+		//File[] listOfFiles = folder.listFiles();
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
@@ -68,8 +82,8 @@ public class MyDataCreator {
 
 		//Schreibt alle Featurevektoren in eine .dat-Datei
 		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), FolderPathnameData, nametag);
-		
-		
+
+
 		//FolderPathenameData in ausgewählen Lerner laden/lernen
 		
 		//Lerner mit Testdaten Evaluieren 
@@ -77,6 +91,8 @@ public class MyDataCreator {
 		//Ausgabe der Testergebnisse
 
 	}
+
+
 
 
 	//Rückgabestrukur {Concept1=[Filename1, Filename2, Filename3,...],Concept2=[Filename1, Filename2, Filename3,...],.. }
@@ -214,13 +230,6 @@ public class MyDataCreator {
 		}
 	}
 
-	/*
-	public static File[] shuffleArrayWithSeed(File[] files, int RandomSeed) {
-		List<File> files_list= new ArrayList<>(Arrays.stream(files).toList());
-		Collections.shuffle(files_list, new Random(RandomSeed));
-		return (File[]) files_list.toArray();
-	}*/
-
 
 	public static File[] shuffleArrayWithSeed(File[] files, int randomSeed) {
 		List<File> filesList = new ArrayList<>(Arrays.asList(files));
@@ -229,11 +238,5 @@ public class MyDataCreator {
 	}
 
 
-	public static void main(String[] args) {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		new MyDataCreator("C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichen","C:\\Users\\Philipp\\Documents\\Master\\Maschinelles Lernen\\Verkehrszeichenerkennung\\ergebnisse 14.01.2025", 7,7);
-
-	}
 }
