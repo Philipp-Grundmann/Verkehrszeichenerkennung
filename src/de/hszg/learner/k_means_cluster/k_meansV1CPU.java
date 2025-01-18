@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
-public class k_meansV1 {
+public class k_meansV1CPU {
 
 private int k; // Anzahl der Cluster
 private int maxIterations; // Maximale Anzahl an Iterationen
@@ -12,7 +12,7 @@ private List<double[]> data; // Die Datenpunkte
 private List<double[]> centroids; // Die Cluster-Zentren
 
 
-    public k_meansV1(int k, int maxIterations, List<double[]> data) {
+    public k_meansV1CPU(int k, int maxIterations, List<double[]> data) {
         this.k = k;
         this.maxIterations = maxIterations;
         this.data = data;
@@ -28,7 +28,7 @@ private List<double[]> centroids; // Die Cluster-Zentren
             int k = 3; // Anzahl der Cluster
             int maxIterations = 100;
 
-            k_meansV1 kMeans = new k_meansV1(k, maxIterations, data);
+            k_meansV1CPU kMeans = new k_meansV1CPU(k, maxIterations, data);
             Map<double[], List<double[]>> clusters = kMeans.fit();
 
             // Ausgabe der Ergebnisse
