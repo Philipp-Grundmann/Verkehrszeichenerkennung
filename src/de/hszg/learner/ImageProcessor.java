@@ -56,7 +56,7 @@ public class ImageProcessor {
 
         //Output_Vektor=new MyFeatureVector(corner,AlleFarbvektoren,c);
 
-        Output_Vektor=new MyFeatureVector(AlleFarbvektoren, c,gridRows,gridCols );
+        Output_Vektor=new MyFeatureVector(AlleFarbvektoren,gridRows,gridCols );
 
         // Merkmalsvektor speichern
         // CloseFeatureVector("feature_vectors.csv");

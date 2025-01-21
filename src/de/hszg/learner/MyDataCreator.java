@@ -4,6 +4,9 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -42,8 +45,8 @@ public class MyDataCreator {
 		//File[] listOfFiles = folder.listFiles();
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
-		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
-		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 500);
+		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 10);
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 600);
 		int sum=fileToConceptMap.size();
 		int progress=0;
 
@@ -82,7 +85,7 @@ public class MyDataCreator {
 
 		//Schreibt alle Featurevektoren in eine .dat-Datei
 		saveManyFeatureVektores(AllFeatureVektores.toArray(new FeatureVector[0]), FolderPathnameData, nametag);
-
+		// Beispiel für die Verwendung der Methode
 
 		//FolderPathenameData in ausgewählen Lerner laden/lernen
 		
@@ -91,8 +94,6 @@ public class MyDataCreator {
 		//Ausgabe der Testergebnisse
 
 	}
-
-
 
 
 	//Rückgabestrukur {Concept1=[Filename1, Filename2, Filename3,...],Concept2=[Filename1, Filename2, Filename3,...],.. }
@@ -224,10 +225,16 @@ public class MyDataCreator {
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
 			out.writeObject(res);
 			out.close();
+			// Beispiel für die Verwendung der Methode
+
 		}catch(Throwable t){
 			System.out.println("DummyDataCreator: Could not create DummyData.dat");
 			t.printStackTrace();
 		}
+
+		String outputPath = "D:\\1.2_Master\\IdeaProjects\\ML-3\\ergebnisse\\features_without_concept.csv";
+		writeToCSV(outputPath, ArrayOfAllFeaturevektores);
+
 	}
 
 
@@ -239,4 +246,27 @@ public class MyDataCreator {
 
 
 
+	public static void writeToCSV(String outputPath, FeatureVector[] arrayOfAllFeatureVectors) {
+		try (PrintWriter writer = new PrintWriter(new FileWriter(outputPath))) {
+			// Schreibe die Header-Zeile (kannst du je nach den Feature-Vektoren anpassen)
+			writer.println("Feature1, Feature2, Feature3, ..., FeatureN"); // Beispiel-Header
+
+			// Iteriere durch alle Feature-Vektoren im Array
+			for (FeatureVector vector : arrayOfAllFeatureVectors) {
+				double[] features = vector.getFeatureVektor(); // Alle Features des Vektors
+				StringBuilder sb = new StringBuilder();
+
+				// Füge die Features in die Zeile ein, getrennt durch Kommas
+				for (double feature : features) {
+					sb.append(feature).append(",");
+				}
+
+				// Entferne das letzte Komma und schreibe die Zeile in die CSV-Datei
+				sb.setLength(sb.length() - 1); // Entferne das letzte Komma
+				writer.println(sb.toString());
+			}
+		} catch (IOException e) {
+			System.out.println("Fehler beim Schreiben der CSV-Datei: " + e.getMessage());
+		}
+	}
 }

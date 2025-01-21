@@ -3,76 +3,44 @@ package de.hszg.learner;
 import java.util.Arrays;
 
 public class MyFeatureVector implements FeatureVector {
-
-	private Concept concept;
-	private double[] feature;//Alle Werte des Arrys werden mit Nullen initalisiert
-	// Anzahl Ecken, Feld 0,0 Blau - Gelb - Rot - Schwarz - Weiß, bis Feld 4,4 Blau - Gelb - Rot - Schwarz - Weiß
-	// Ecken, Blau, Gelb, Rot, Schwarz, Blau, Gelb, Rot, Schwarz,.. (5*5Felder*5Farben = 125 Farbvektoren)
+	private double[] featureVector;
 	private int gridRows;
 	private int gridCols;
 
-	MyFeatureVector(int corner, double[] colors, Concept concept_input){
-		feature=colors;
-
-		//Code für Ecken im FV
-		//feature = new double[colors.length+1];
-		//feature[0] = (double) corner;
-		//System.arraycopy(colors, 0, feature, 1, colors.length); //Kopiert alle Werte aus colors-Arry in Feature Vektor
-
-		/*for (int i = 0; i < 125; i++) {
-			feature[i+1] = Math.random(); // zufällige Werte zum Testen
-		}*/
-		concept = concept_input;
+	// Konstruktor ohne Concept:
+	public MyFeatureVector(double[] featureVector, int gridRows, int gridCols) {
+		this.featureVector = featureVector;
+		this.gridRows = gridRows;
+		this.gridCols = gridCols;
 	}
-
-	MyFeatureVector(double[] colors, Concept concept_input){
-		feature=colors;
-		concept = concept_input;
-	}
-
-	MyFeatureVector(double[] colors, Concept concept_input, int gridRows, int gridCols){
-		feature=colors;
-		concept = concept_input;
-		this.gridRows=gridRows;
-		this.gridCols=gridCols;
-	}
-	
-	@Override
-	public Concept getConcept() {
-		return concept;
-	}
-
-	public boolean[] getArrayOfConcept(){
-			return NeuronalesNetzwerkLearner.ConceptToOutputArray(concept);}
 
 	@Override
 	public int getNumFeatures() {
-		//System.out.println("Länge des Feature Vektores: "+feature.length);
-		return feature.length;
+		return featureVector.length;
 	}
 
 	@Override
 	public double getFeatureValue(int i) {
-		return feature[i];
+		return featureVector[i];
 	}
 
-	public double[] getFeatureVektor(){
-		return feature;
-	};
-
-	public String getPrintVektorValue(){
-		return Arrays.toString(feature);
+	@Override
+	public String getPrintVektorValue() {
+		return Arrays.toString(featureVector);
 	}
 
-	public int getGridRows() {
-		return gridRows;
+	@Override
+	public double[] getFeatureVektor() {
+		return featureVector;
 	}
 
+	@Override
 	public int getGridCols() {
 		return gridCols;
 	}
 
-	public int getSizePerImage(){
-		return (gridCols*gridRows*5);
+	@Override
+	public int getGridRows() {
+		return gridRows;
 	}
 }

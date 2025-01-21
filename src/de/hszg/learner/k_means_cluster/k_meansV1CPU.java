@@ -22,8 +22,13 @@ private List<double[]> centroids; // Die Cluster-Zentren
     public static void main(String[] args) {
         try {
             // Pfad zur .dat-Datei
-            String filePath = "path/to/your/datafile.dat";
-            List<double[]> data = readDataFromFile(filePath);
+            String filePath = "D:\\1.2_Master\\IdeaProjects\\ML-3\\ergebnisse\\features_without_concept.csv";
+            List<double[]> data = readDataFromCsv(filePath);
+
+
+           // vincent pfade
+           // String filePath = "D:\\1.2_Master\\IdeaProjects\\ML-3\\ergebnisse\\features_without_concept.csv";
+           // List<double[]> data = readDataFromCsv(filePath);
 
             int k = 3; // Anzahl der Cluster
             int maxIterations = 100;
@@ -39,10 +44,18 @@ private List<double[]> centroids; // Die Cluster-Zentren
                     System.out.println(Arrays.toString(point));
                 }
             }
+            String outputFilePath = "D:\\1.2_Master\\IdeaProjects\\ML-3\\ergebnisse\\kmeans_result.csv";
+            writeClustersToCsv(outputFilePath, clusters);
+
+            //vincent pfade
+
+            //String outputFilePath = "D:\\1.2_Master\\IdeaProjects\\ML-3\\ergebnisse\\kmeans_result.csv";
+            //writeClustersToCsv(outputFilePath, clusters);
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             System.err.println("Fehler: " + e.getMessage());
         }
+
     }
 
     public Map<double[], List<double[]>> fit() throws InterruptedException, ExecutionException {
@@ -158,17 +171,35 @@ private List<double[]> centroids; // Die Cluster-Zentren
         return mean;
     }
 
-    public static List<double[]> readDataFromFile(String filePath) throws IOException {
+    public static List<double[]> readDataFromCsv(String filePath) throws IOException {
         List<double[]> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.trim().split("\\s+|,"); // Leerzeichen oder Komma als Trenner
+                // Spalten durch Kommas getrennt parsen
+                String[] parts = line.trim().split(",");
                 double[] point = Arrays.stream(parts).mapToDouble(Double::parseDouble).toArray();
                 data.add(point);
             }
         }
         return data;
+    }
+
+    public static void writeClustersToCsv(String filePath, Map<double[], List<double[]>> clusters) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Map.Entry<double[], List<double[]>> entry : clusters.entrySet()) {
+                double[] centroid = entry.getKey();
+                writer.write("Cluster-Zentrum: " + Arrays.toString(centroid));
+                writer.newLine();
+                writer.write("Punkte:");
+                writer.newLine();
+                for (double[] point : entry.getValue()) {
+                    writer.write(Arrays.toString(point));
+                    writer.newLine();
+                }
+                writer.newLine();
+            }
+        }
     }
 
 }

@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
+/**
 public class Evaluator {
 	/** the percentage (between 0 und 100) of vectors from the data to be used for the test, all others are training
-	*/
+
 	private static int testRate = 60;
 
 
@@ -81,7 +81,7 @@ public class Evaluator {
 	 * Evaluate the result from the test for output or furthjer considerations
 	 * @param result_static Ergebnissvektor der Lernfunktion mit Einstellungsparametern
 	 * @param result_classify Ergebnissvektor des Klassifizierungsprozesses, welche die Grundlage für eine statistische Auswertung bilden
-	 */
+
 	private void evalResult(Vector<Integer>result_static, Vector<Integer> result_classify,Vector<Integer> result_lern) {
 		// TODO hier muss mehr Auswertung passieren, insbes: Vertrauensintervalle etc
 		System.out.println("Learning result: \n correct: "+result_classify.get(0)+"\n unknown: "+result_classify.get(1)+"\n wrong: "+result_classify.get(2));
@@ -125,7 +125,7 @@ public class Evaluator {
 	 * @param learner: The learner to be tests
 	 * 
 	 * @return a vector containing the test results: success, unknown, false
-	 */
+
 	 private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		int success=0;int unknown=0;int fault =0;
 		int ges_stop=0; int suc_stop=0;
@@ -208,7 +208,7 @@ public class Evaluator {
  * @param vectors a list of vectors
  * @return list containing the same vectors as parameter but 
  * (usually) in different order
- */
+
 	private List<FeatureVector> mixData(List<FeatureVector> vectors, int seedValue) {
 		Collections.shuffle(vectors, new Random(seedValue));
 		return vectors;
@@ -222,7 +222,7 @@ public class Evaluator {
 	 * @param vectors :a List fo Feature Vectors we can use for the test
 	 * @return a List containt two Lists: first the training data, second the test data they are disjunct subsets of vector 
 	 *
-	 */
+
 	private List<List<FeatureVector>> extractTrainingData(
 			List<FeatureVector> vectors) {
 		List<List<FeatureVector>> result = new LinkedList<>();
@@ -242,7 +242,7 @@ public class Evaluator {
 	 * 
 	 * @param filename the file with this name should contain a serialized List<FeatureVector> containt all the data
 	 * @return all the data
-	 */
+
 	private List<FeatureVector> readData(String filename) {
 		List<FeatureVector> vectors = null;
 		try{
@@ -257,7 +257,7 @@ public class Evaluator {
 	}
 
 	/** startet das Programm mit den hinterlegten Trainingsdaten
-	 */
+
 	public static void main(String[] args){
 		//filename_feature_vektor ist als static String innerhalb der Klasse definiert
 		//String filename= "C:\\Code\\Daten\\Evaulation\\VektorData_20241122_224715_S5xZ5.dat";
@@ -284,7 +284,7 @@ public class Evaluator {
 		System.out.println("Concept: "+Concept.Fahrtrichtung_rechts.toString()+" Bitfolge: "+ Arrays.toString(NeuronalesNetzwerkLearner.ConceptToOutputArray(Concept.Fahrtrichtung_rechts)));
 		System.out.println("Concept: "+Concept.Vorfahrt_gewähren.toString()+" Bitfolge: "+ Arrays.toString(NeuronalesNetzwerkLearner.ConceptToOutputArray(Concept.Vorfahrt_gewähren)));
 		System.out.println("Concept: "+Concept.Vorfahrtsstraße.toString()+" Bitfolge: "+ Arrays.toString(NeuronalesNetzwerkLearner.ConceptToOutputArray(Concept.Vorfahrtsstraße)));
-*/
+
 	}
 
 	// Methode zur Berechnung der Erfolgsrate (richtig klassifizierte Bilder / alle Bilder)
@@ -374,9 +374,10 @@ public class Evaluator {
         res.add(4, trainingSet.getFirst().getSizePerImage()); //Sollte das Gleiche sein
         res.add(5, trainingSet.getFirst().getGridCols());
         res.add(6, trainingSet.getFirst().getGridRows());
-		* */
+		*
 
 
 
 	}
 }
+*/
