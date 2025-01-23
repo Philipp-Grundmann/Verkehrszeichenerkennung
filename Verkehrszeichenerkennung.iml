@@ -3,6 +3,10 @@
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$" dumb="true">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/Daten" />
+      <excludeFolder url="file://$MODULE_DIR$/Orginal" />
+      <excludeFolder url="file://$MODULE_DIR$/Philipp" />
+      <excludeFolder url="file://$MODULE_DIR$/ergebnisse_aus_V2" />
     </content>
   </component>
 </module>

@@ -42,9 +42,6 @@ public class MyFeatureVector implements FeatureVector {
 		return concept;
 	}
 
-	public boolean[] getArrayOfConcept(){
-			return NeuronalesNetzwerkLearner.ConceptToOutputArray(concept);}
-
 	@Override
 	public int getNumFeatures() {
 		//System.out.println("Länge des Feature Vektores: "+feature.length);
@@ -58,7 +55,14 @@ public class MyFeatureVector implements FeatureVector {
 
 	public double[] getFeatureVektor(){
 		return feature;
-	};
+	}
+
+	@Override
+	public boolean[] getArrayOfConcept() {
+		return new boolean[0];
+	}
+
+	;
 
 	public String getPrintVektorValue(){
 		return Arrays.toString(feature);
