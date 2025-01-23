@@ -16,33 +16,14 @@ public class MyDataCreator {
 
 	private static final String filename = "DummyData"+generateDateTimeforFilename()+".dat";
 
-	/**
-	 * Constuctor für DummyDaten
-	 */
-	MyDataCreator(){
-		double[] ColorArray = new double[125];
-		int DummyCorner = 1;
+	public static void main(String[] args) {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		FeatureVector[] f = new FeatureVector[6];
-		f[0] = new MyFeatureVector(DummyCorner,ColorArray,Concept.Stoppschild);
-
-		/*
-		List<FeatureVector> res = new LinkedList<>();
-		for(FeatureVector fv : f) res.add(fv);
-		try{
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
-			out.writeObject(res);
-			out.close();
-		}catch(Throwable t){
-			System.out.println("DummyDataCreator: Could not create DummyData.dat");
-			t.printStackTrace();
-		}*/
-		saveManyFeatureVektores(f, "C:\\3500","DEMO");
+		new MyDataCreator("C:\\Verkehrszeichen",".\\ergebnisse", 2,2);  //Testdaten erstellen - hat funktioniert
 
 	}
-
-
-	//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
+		//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
 	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, int gridCols, int gridRows){
 		//Bilder aus Ordner einlesen und FeatureVektor erstellen und in eine Datei in FolderPathnameData abspeichern 
 
@@ -52,7 +33,7 @@ public class MyDataCreator {
 
 		List<FeatureVector> AllFeatureVektores=new LinkedList<>();
 		//Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
-		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 50);
+		Map<File, Concept> fileToConceptMap = loadFilesByFolder(FolderPathnameImages, 500);
 		int sum=fileToConceptMap.size();
 		int progress=0;
 
@@ -271,22 +252,4 @@ public class MyDataCreator {
 		return filesList.toArray(new File[0]);
 	}
 
-
-	public static void main(String[] args) {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		//loadFilesByFolder("C:\\Verkehrszeichen",3);
-
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 2,2);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,3);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,4);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,5);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 7,7);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 10,10);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 15,15);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 4,3);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,4);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 3,5);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("C:\\Verkehrszeichen","C:\\3500", 5,3);  //Testdaten erstellen - hat funktioniert
-		//new MyDataCreator(); //DummyData Creater
-	}
 }

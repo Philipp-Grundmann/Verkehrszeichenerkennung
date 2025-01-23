@@ -369,10 +369,6 @@ public class ImageProcessor {
 
 
 
-
-
-
-
     FeatureVector getOutput_Vektor(){
         //System.out.println("Erzeugter Vektor - Concept: "+ c +" | Output-Vektor: "+Output_Vektor.toString());
         return Output_Vektor;
