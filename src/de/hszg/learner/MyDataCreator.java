@@ -11,6 +11,8 @@ import java.util.*;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 
+import javax.swing.*;
+
 
 public class MyDataCreator {
 
