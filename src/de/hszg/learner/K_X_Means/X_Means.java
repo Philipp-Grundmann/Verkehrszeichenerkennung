@@ -8,11 +8,12 @@ public class X_Means {
 
             int randomSeed = 42;
             int maxIterations = 200;
-            int maxCluster = 10;
+            int maxCluster = 100;
             double trainSplitRatio = 0.8;
 
             String outputPath = "src/de/hszg/learner/ergebnisse/xmeans_results.csv";
-            String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250121_193812_S7xZ7.csv";
+            //String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250121_193812_S7xZ7.csv";
+            String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250125_154632_S4xZ4.csv";
 
             DataLoader dataLoader = new DataLoader(csvFilePath, randomSeed);
             DataLoader.DataSet dataSet = dataLoader.loadData(trainSplitRatio);

@@ -97,36 +97,81 @@ public class X_Means_Modell {
         }
 
         double averageDistance = calculateAverageDistance(centroids);
-        double similarityThreshold = averageDistance * 0.5;
+        double similarityThreshold = averageDistance * 1.5;
 
-        List<Cluster> mergedClusters = new ArrayList<>();
+        List<Cluster> mergedClusters = new ArrayList<>(clusters);
         boolean[] merged = new boolean[centroids.length];
+        int previousClusterCount = mergedClusters.size();
+        boolean anyChanges;
 
-        for (int i = 0; i < clusters.size(); i++) {
-            if (merged[i]) continue;
+        do {
+            anyChanges = false; // Reset flag for each iteration
 
-            Cluster currentCluster = clusters.get(i);
-            List<Cluster> similarClusters = new ArrayList<>();
-            similarClusters.add(currentCluster);
+            // Für jedes Cluster überprüfen und zusammenfassen
+            List<Cluster> newMergedClusters = new ArrayList<>();
+            boolean[] newlyMerged = new boolean[centroids.length];
 
-            for (int j = i + 1; j < clusters.size(); j++) {
-                if (!merged[j]) {
-                    double distance = euclideanDistance(currentCluster.centroid, clusters.get(j).centroid);
+            for (int i = 0; i < mergedClusters.size(); i++) {
+                if (newlyMerged[i]) continue;
 
-                    if (distance <= similarityThreshold) {
-                        System.out.printf("Cluster %d und Cluster %d werden zusammengefasst.%n", i, j);
-                        similarClusters.add(clusters.get(j));
-                        merged[j] = true;
+                Cluster currentCluster = mergedClusters.get(i);
+                List<Cluster> similarClusters = new ArrayList<>();
+                similarClusters.add(currentCluster);
+
+                for (int j = i + 1; j < mergedClusters.size(); j++) {
+                    if (!newlyMerged[j]) {
+                        Cluster otherCluster = mergedClusters.get(j);
+                        double distance = euclideanDistance(currentCluster.centroid, otherCluster.centroid);
+                        if (distance <= similarityThreshold && currentCluster.assignedClass.equals(otherCluster.assignedClass)) {
+                            System.out.printf("Cluster %d und Cluster %d werden zusammengefasst (Klasse: %s).%n", i, j, currentCluster.assignedClass);
+                            similarClusters.add(otherCluster);
+                            newlyMerged[j] = true;
+                            anyChanges = true;  // Änderungen wurden gemacht
+                        }
                     }
+                }
+
+                if (similarClusters.size() > 1) {
+                    Cluster mergedCluster = combineClusters(similarClusters);
+                    newMergedClusters.add(mergedCluster);
+                } else {
+                    newMergedClusters.add(currentCluster);
                 }
             }
 
-            Cluster mergedCluster = combineClusters(similarClusters);
-            mergedClusters.add(mergedCluster);
-        }
+            mergedClusters = new ArrayList<>(newMergedClusters);
 
+            // Abbruch, wenn keine Cluster mehr zusammengefasst wurden
+            if (previousClusterCount == mergedClusters.size()) {
+                System.out.println("Keine Cluster mehr zusammengefasst. Abbruch, da keine Veränderung der Anzahl.");
+                break;
+            }
+
+            // Überprüfen, ob alle Klassen mindestens ein Cluster haben
+            if (!hasAllClassesClusters(mergedClusters, clusterToClassMap)) {
+                System.out.println("Abbruch, da nicht für jede Klasse ein Cluster vorhanden ist.");
+                break;
+            }
+
+            previousClusterCount = mergedClusters.size();
+
+        } while (anyChanges);
+
+        System.out.println("Clusterzusammenführung abgeschlossen.");
         return mergedClusters;
     }
+
+    // Hilfsmethode zur Überprüfung, ob für jede Klasse mindestens ein Cluster existiert
+    private boolean hasAllClassesClusters(List<Cluster> mergedClusters, Map<Integer, String> clusterToClassMap) {
+        Set<String> classesInClusters = new HashSet<>();
+        for (Cluster cluster : mergedClusters) {
+            classesInClusters.add(cluster.assignedClass);
+        }
+
+        Set<String> allClasses = new HashSet<>(clusterToClassMap.values());
+        return allClasses.equals(classesInClusters);
+    }
+
 
     private Cluster combineClusters(List<Cluster> similarClusters) {
         int dimensions = similarClusters.get(0).centroid.length;
