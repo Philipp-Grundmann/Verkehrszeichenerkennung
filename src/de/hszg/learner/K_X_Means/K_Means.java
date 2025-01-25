@@ -2,8 +2,6 @@ package de.hszg.learner.K_X_Means;
 
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class K_Means {
 
@@ -40,8 +38,8 @@ public class K_Means {
 
 
             // K-Means konfigurieren und ausführen
-            K_Means_Modell K_Means_Modell = new K_Means_Modell(6,  100, 42);
-            K_Means_Modell.run(dataSet.trainData, outputPath);
+            K_Means_Modell K_Means_Modell = new K_Means_Modell(10,   200, 42);
+            K_Means_Modell.run(dataSet.trainData,dataSet.trainLabels, outputPath);
 
 
 
