@@ -1,6 +1,7 @@
 package de.hszg.learner.K_X_Means;
 
 import smile.clustering.XMeans;
+import de.hszg.learner.K_X_Means.SilhouetteCoefficient;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -38,10 +39,15 @@ public class X_Means_Modell {
             System.out.printf("Cluster %d -> Klasse: %s%n", i, mergedClusters.get(i).assignedClass);
         }
 
+        // Silhouette-Koeffizient berechnen
+        double silhouetteCoefficient = SilhouetteCoefficient.calculateSilhouette(trainingSet, xmeans.y);
+        System.out.println("Silhouette-Koeffizient: " + silhouetteCoefficient);
+
         // Ergebnisse speichern
         saveResultsToCSV(mergedClusters, outputPath);
         System.out.println("X-Means-Clustering abgeschlossen. Ergebnisse wurden in: " + outputPath + " gespeichert.");
     }
+
 
     private Map<Integer, String> classifyClusters(int[] clusterLabels, List<double[]> trainingSetList, List<String> trafficSignLabels) {
         Map<Integer, Map<String, Integer>> clusterClassCounts = new HashMap<>();
@@ -97,7 +103,7 @@ public class X_Means_Modell {
         }
 
         double averageDistance = calculateAverageDistance(centroids);
-        double similarityThreshold = averageDistance * 1.5;
+        double similarityThreshold = averageDistance * 1.1;
 
         List<Cluster> mergedClusters = new ArrayList<>(clusters);
         boolean[] merged = new boolean[centroids.length];
