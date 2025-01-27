@@ -1,6 +1,7 @@
 package de.hszg.learner.K_X_Means;
 
 import java.io.IOException;
+import java.util.List;
 
 public class X_Means {
     public static void main(String[] args) {
@@ -13,7 +14,7 @@ public class X_Means {
 
             String outputPath = "src/de/hszg/learner/ergebnisse/xmeans_results.csv";
             //String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250121_193812_S7xZ7.csv";
-            String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250125_154632_S4xZ4.csv";
+            String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250125_194044_S3xZ3.csv";
 
             DataLoader dataLoader = new DataLoader(csvFilePath, randomSeed);
             DataLoader.DataSet dataSet = dataLoader.loadData(trainSplitRatio);
@@ -23,8 +24,16 @@ public class X_Means {
             X_Means_Modell x_means_modell = new X_Means_Modell(maxCluster, maxIterations, randomSeed);
             x_means_modell.run(dataSet.trainData, dataSet.trainLabels, outputPath);
 
-        }catch(IOException e){
-            e.printStackTrace();
+            // Cluster laden
+            ClusterCSVLoader clusterLoader = new ClusterCSVLoader(outputPath);
+            List<ClusterCSVLoader.Cluster> clusters = clusterLoader.loadClusters();
+
+            // Evaluator initialisieren
+            Evaluator evaluator = new Evaluator(dataSet.testData, dataSet.testLabels, clusters);
+            // Evaluation durchführen
+            evaluator.evaluate();
+        } catch (IOException e) {
+            System.err.println("Fehler beim Laden der Dateien: " + e.getMessage());
         }
     }
 }
