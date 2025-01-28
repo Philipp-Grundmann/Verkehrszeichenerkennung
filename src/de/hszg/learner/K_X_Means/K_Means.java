@@ -16,6 +16,7 @@ public class K_Means {
 
             String outputPath = "src/de/hszg/learner/ergebnisse/kmeans_results.csv";
             String csvFilePath = "src/de/hszg/learner/ergebnisse/VektorData_20250125_154632_S4xZ4.csv";
+            String resultPath = "src\\de\\hszg\\learner\\ergebnisse/K_Means_Result.csv";
 
 
             //String csvData = new String(Files.readAllBytes(Paths.get(outputPath)));
@@ -40,7 +41,7 @@ public class K_Means {
 
 
             // K-Means konfigurieren und ausführen
-            K_Means_Modell K_Means_Modell = new K_Means_Modell(10,   200, 42);
+            K_Means_Modell K_Means_Modell = new K_Means_Modell(12,   150, 42);
             K_Means_Modell.run(dataSet.trainData,dataSet.trainLabels, outputPath,dataSet.testLabels,dataSet.testData);
 
             // Cluster laden
@@ -48,7 +49,7 @@ public class K_Means {
             List<ClusterCSVLoader.Cluster> clusters = clusterLoader.loadClusters();
 
             // Evaluator initialisieren
-            Evaluator evaluator = new Evaluator(dataSet.testData, dataSet.testLabels, clusters);
+            Evaluator evaluator = new Evaluator(dataSet.testData, dataSet.testLabels, clusters,resultPath);
             // Evaluation durchführen
             evaluator.evaluate();
             } catch (IOException e) {
