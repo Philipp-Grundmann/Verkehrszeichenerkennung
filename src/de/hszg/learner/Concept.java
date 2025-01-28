@@ -2,12 +2,12 @@ package de.hszg.learner;
 
 public enum Concept {
     Unknown,
-    Stoppschild,
-    Vorfahrt_von_Rechts,
-    Vorfahrt_gewähren,
-    Fahrtrichtung_links,
-    Fahrtrichtung_rechts,
-    Vorfahrtsstraße,
+    STOP,
+    VORFAHRT_VON_RECHTS,
+    VORFAHRT_GEWAEHREN,
+    FAHRTRICHTUNG_LINKS,
+    FAHRTRICHTUNG_RECHTS,
+    VORFAHRTSSTRASSE,
     Unknown1;
 }
 

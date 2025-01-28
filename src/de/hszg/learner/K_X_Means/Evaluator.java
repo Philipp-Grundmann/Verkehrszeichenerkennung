@@ -101,12 +101,16 @@ public class Evaluator {
                 EvaluationMetrics metrics = entry.getValue();
 
                 // Prozentzahlen und Nachkommastellen mit Punkt formatieren
-                String accuracy = String.format(Locale.US, "%.2f", metrics.accuracy * 100);
-                String stdDev = String.format(Locale.US, "%.2f", metrics.stdDev * 100);
-                String lowerBound = String.format(Locale.US, "%.2f", metrics.lowerBound * 100);
-                String upperBound = String.format(Locale.US, "%.2f", metrics.upperBound * 100);
+                String accuracy = String.format(Locale.US, "%.2f", metrics.accuracy);
+                String stdDev = String.format(Locale.US, "%.2f", metrics.stdDev );
+                String lowerBound = String.format(Locale.US, "%.2f", metrics.lowerBound );
+                String upperBound = String.format(Locale.US, "%.2f", metrics.upperBound );
 
-                writer.write(String.format(",%d/%d (%s%%)", metrics.correct, metrics.total, accuracy));
+                // Die Zeile mit der Zählung auskommentieren, um sie zu entfernen
+                // writer.write(String.format(",%d/%d (%s%%)", metrics.correct, metrics.total, accuracy));
+
+                // Stattdessen nur den Accuracy-Prozentsatz pro Klasse ausgeben
+                writer.write(String.format(",%s", accuracy));
             }
 
             // Berechnung der Gesamtstatistiken
@@ -115,10 +119,10 @@ public class Evaluator {
             double overallAccuracy = calculateOverallAccuracy(classMetrics.values());
 
             // Gesamtstatistiken mit Punkt statt Komma
-            String overallAccuracyStr = String.format(Locale.US, "%.2f", overallAccuracy * 100);
-            String overallStdDevStr = String.format(Locale.US, "%.2f", overallStdDev * 100);
-            String lowerCI = String.format(Locale.US, "%.2f", confidenceInterval[0] * 100);
-            String upperCI = String.format(Locale.US, "%.2f", confidenceInterval[1] * 100);
+            String overallAccuracyStr = String.format(Locale.US, "%.2f", overallAccuracy );
+            String overallStdDevStr = String.format(Locale.US, "%.2f", overallStdDev );
+            String lowerCI = String.format(Locale.US, "%.2f", confidenceInterval[0] );
+            String upperCI = String.format(Locale.US, "%.2f", confidenceInterval[1] );
 
             writer.write(String.format(",%s,%s,%s,%s",
                     overallAccuracyStr, overallStdDevStr, lowerCI, upperCI));

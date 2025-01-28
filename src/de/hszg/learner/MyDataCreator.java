@@ -1,9 +1,6 @@
 package de.hszg.learner;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -16,14 +13,13 @@ import javax.swing.*;
 
 public class MyDataCreator {
 
-	private static final String filename = "DummyData"+generateDateTimeforFilename()+".dat";
-
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
-		new MyDataCreator("C:\\Verkehrszeichen",".\\ergebnisse", 2,2);  //Testdaten erstellen - hat funktioniert
-
+		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 4,4);  //Testdaten erstellen - hat funktioniert
+		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 5,5);
+		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 3,3);
 	}
 		//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
 	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, int gridCols, int gridRows){
@@ -126,12 +122,12 @@ public class MyDataCreator {
 
 	public static Concept mainFolderName_StrToConcept(String MainFolderName){
 		switch (MainFolderName){
-			case "209 - Fahrtrichtung links": 	return Concept.Fahrtrichtung_links;
-			case "306 - Vorfahrtsstrasse": 		return Concept.Vorfahrtsstraße;
-			case "206 - Stop": 					return Concept.Stoppschild;
-			case "205 - Vorfahrt gewaehren": 	return  Concept.Vorfahrt_gewähren;
-			case "209 - Fahrtrichtung rechts":	return Concept.Fahrtrichtung_rechts;
-			case "102 - Vorfahrt von rechts":	return Concept.Vorfahrt_von_Rechts;
+			case "FAHRTRICHTUNG_LINKS": 	return Concept.FAHRTRICHTUNG_LINKS;
+			case "VORFAHRTSSTRASSE": 		return Concept.VORFAHRTSSTRASSE;
+			case "STOP": 					return Concept.STOP;
+			case "VORFAHRT_GEWAEHREN": 	return  Concept.VORFAHRT_GEWAEHREN;
+			case "FAHRTRICHTUNG_RECHTS":	return Concept.FAHRTRICHTUNG_RECHTS;
+			case "VORFAHRT_VON_RECHTS":	return Concept.VORFAHRT_VON_RECHTS;
 			default:
 				System.out.println("Das Verkehrszeichen konnte nicht Identifiziert werden!");
 				return Concept.Unknown;
@@ -225,27 +221,27 @@ public class MyDataCreator {
 		return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".bmp");
 	}
 
-	public void saveManyFeatureVektores(FeatureVector[] ArrayOfAllFeaturevektores,String FolderPathnameData, String nametag) {
-		String filename = FolderPathnameData+"\\VektorData"+generateDateTimeforFilename()+nametag+".dat";
+	public void saveManyFeatureVektores(FeatureVector[] arrayOfAllFeatureVectors, String folderPathnameData, String nametag) {
+		// Pfad für die .dat-Datei
+		String filename = folderPathnameData + "\\VektorData" + generateDateTimeforFilename() + nametag + ".dat";
 
+		// Feature-Vektoren in .dat speichern
 		List<FeatureVector> res = new LinkedList<>();
-		for(FeatureVector fv : ArrayOfAllFeaturevektores) res.add(fv);
-		try{
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
+		Collections.addAll(res, arrayOfAllFeatureVectors);
+		try (ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)))) {
 			out.writeObject(res);
-			out.close();
-		}catch(Throwable t){
-			System.out.println("DummyDataCreator: Could not create DummyData.dat");
+			System.out.println("Feature-Vektoren erfolgreich in die Datei geschrieben: " + filename);
+		} catch (Throwable t) {
+			System.err.println("Fehler beim Speichern der Feature-Vektoren in der .dat-Datei");
 			t.printStackTrace();
 		}
-	}
 
-	/*
-	public static File[] shuffleArrayWithSeed(File[] files, int RandomSeed) {
-		List<File> files_list= new ArrayList<>(Arrays.stream(files).toList());
-		Collections.shuffle(files_list, new Random(RandomSeed));
-		return (File[]) files_list.toArray();
-	}*/
+		// Pfad für die CSV-Datei
+		String csvFilePath = folderPathnameData + "\\VektorData" + generateDateTimeforFilename() + nametag + ".csv";
+
+		// Feature-Vektoren in CSV speichern
+		saveFeatureVectorToCSV(csvFilePath, arrayOfAllFeatureVectors);
+	}
 
 
 	public static File[] shuffleArrayWithSeed(File[] files, int randomSeed) {
@@ -254,4 +250,29 @@ public class MyDataCreator {
 		return filesList.toArray(new File[0]);
 	}
 
+	public static void saveFeatureVectorToCSV(String outputPath, FeatureVector[] featureVectors) {
+		try (FileWriter writer = new FileWriter(outputPath, true)) {
+			for (FeatureVector featureVector : featureVectors) {
+				StringBuilder line = new StringBuilder();
+
+				// Konzept (Label) hinzufügen
+				line.append(featureVector.getConcept().toString());
+
+				// Alle Feature-Werte hinzufügen
+				for (int i = 0; i < featureVector.getNumFeatures(); i++) {
+					line.append(",");
+					line.append(featureVector.getFeatureValue(i));
+				}
+
+				// Neue Zeile hinzufügen
+				line.append("\n");
+
+				// In die Datei schreiben
+				writer.write(line.toString());
+			}
+			System.out.println("Alle Feature-Vektoren erfolgreich in die CSV-Datei geschrieben: " + outputPath);
+		} catch (IOException e) {
+			System.err.println("Fehler beim Schreiben der Feature-Vektoren in die CSV-Datei: " + e.getMessage());
+		}
+	}
 }

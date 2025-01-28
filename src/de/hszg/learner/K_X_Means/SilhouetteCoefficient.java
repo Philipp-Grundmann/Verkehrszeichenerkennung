@@ -5,8 +5,8 @@ import java.util.Arrays;
 public class SilhouetteCoefficient {
 
     public static double calculateSilhouette(double[][] data, int[] labels) {
-        int numPoints = Math.min(1000, data.length);
-        //int numPoints = data.length;
+        //int numPoints = Math.min(1000, data.length);
+        int numPoints = data.length;
 
         double[] silhouetteScores = new double[numPoints];
 

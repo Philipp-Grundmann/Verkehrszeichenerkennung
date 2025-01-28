@@ -17,7 +17,7 @@ public class K_Means_Modell {
         this.randomSeed = randomSeed;
     }
 
-    public void run(List<double[]> trainingSetList, List<String> trafficSignLabels, String outputPath) {
+    public List<Cluster> run(List<double[]> trainingSetList, List<String> trafficSignLabels, String outputPath, List<String> testLabels, List<double[]> testData) {
         double[][] trainingSet = convertListToArray(trainingSetList);
 
         System.out.println("Starte K-Means-Clustering mit " + numClusters + " Clustern...");
@@ -32,6 +32,7 @@ public class K_Means_Modell {
         // Cluster zusammenfassen
         List<Cluster> mergedClusters = mergeSimilarClusters(centroids, clusterToClassMap);
 
+
         // Ergebnisse ausgeben
         System.out.println("Neue Anzahl der Cluster nach Zusammenfassung: " + mergedClusters.size());
         for (int i = 0; i < mergedClusters.size(); i++) {
@@ -41,7 +42,19 @@ public class K_Means_Modell {
         // Ergebnisse speichern
         saveResultsToCSV(mergedClusters, outputPath);
         System.out.println("K-Means-Clustering abgeschlossen. Ergebnisse wurden in: " + outputPath + " gespeichert.");
+
+
+        // Silhouette-Koeffizient berechnen
+        double silhouetteCoefficient = SilhouetteCoefficient.calculateSilhouette(trainingSet, kmeans.y);
+        System.out.println("Silhouette-Koeffizient: " + silhouetteCoefficient);
+
+        // Ergebnisse speichern
+        saveResultsToCSV(mergedClusters, outputPath);
+        System.out.println("X-Means-Clustering abgeschlossen. Ergebnisse wurden in: " + outputPath + " gespeichert.");
+        return mergedClusters;
+
     }
+
 
     private Map<Integer, String> classifyClusters(int[] clusterLabels, List<double[]> trainingSetList, List<String> trafficSignLabels) {
         Map<Integer, Map<String, Integer>> clusterClassCounts = new HashMap<>();
