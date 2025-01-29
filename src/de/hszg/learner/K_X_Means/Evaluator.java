@@ -101,7 +101,7 @@ public class Evaluator {
                 EvaluationMetrics metrics = entry.getValue();
 
                 // Prozentzahlen und Nachkommastellen mit Punkt formatieren
-                String accuracy = String.format(Locale.US, "%.2f", metrics.accuracy);
+                String accuracy = String.format(Locale.US, "%.2f", metrics.accuracy*100);
                 String stdDev = String.format(Locale.US, "%.2f", metrics.stdDev );
                 String lowerBound = String.format(Locale.US, "%.2f", metrics.lowerBound );
                 String upperBound = String.format(Locale.US, "%.2f", metrics.upperBound );
@@ -119,13 +119,13 @@ public class Evaluator {
             double overallAccuracy = calculateOverallAccuracy(classMetrics.values());
 
             // Gesamtstatistiken mit Punkt statt Komma
-            String overallAccuracyStr = String.format(Locale.US, "%.2f", overallAccuracy );
-            String overallStdDevStr = String.format(Locale.US, "%.2f", overallStdDev );
-            String lowerCI = String.format(Locale.US, "%.2f", confidenceInterval[0] );
-            String upperCI = String.format(Locale.US, "%.2f", confidenceInterval[1] );
+            String overallAccuracyStr = String.format(Locale.US, "%.2f", overallAccuracy);
+            //String overallStdDevStr = String.format(Locale.US, "%.2f", overallStdDev );
+            //String lowerCI = String.format(Locale.US, "%.2f", confidenceInterval[0] );
+            //String upperCI = String.format(Locale.US, "%.2f", confidenceInterval[1] );
 
-            writer.write(String.format(",%s,%s,%s,%s",
-                    overallAccuracyStr, overallStdDevStr, lowerCI, upperCI));
+            writer.write(String.format(",%s", //,%s,%s,%s
+                    overallAccuracyStr));//, overallStdDevStr, lowerCI, upperCI
             writer.newLine();
         }
 

@@ -1,7 +1,7 @@
 package de.hszg.learner.K_X_Means;
 
 import smile.clustering.XMeans;
-import de.hszg.learner.K_X_Means.SilhouetteCoefficient;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -11,11 +11,13 @@ public class X_Means_Modell {
     private final int kMax;
     private final int maxIterations;
     private final long randomSeed;
+    private final String silhouettePath;
 
-    public X_Means_Modell(int kMax, int maxIterations, long randomSeed) {
+    public X_Means_Modell(int kMax, int maxIterations, long randomSeed, String silhouetteOutputPath) {
         this.kMax = kMax;
         this.maxIterations = maxIterations;
         this.randomSeed = randomSeed;
+        this.silhouettePath=silhouetteOutputPath;
     }
 
     public void run(List<double[]> trainingSetList, List<String> trafficSignLabels, String outputPath) {
@@ -42,6 +44,9 @@ public class X_Means_Modell {
         // Silhouette-Koeffizient berechnen
         double silhouetteCoefficient = SilhouetteCoefficient.calculateSilhouette(trainingSet, xmeans.y);
         System.out.println("Silhouette-Koeffizient: " + silhouetteCoefficient);
+
+        // Silhouette-Ergebnisse speichern
+        saveSilhouetteToCSV(silhouetteCoefficient, silhouettePath);
 
         // Ergebnisse speichern
         saveResultsToCSV(mergedClusters, outputPath);
@@ -239,6 +244,16 @@ public class X_Means_Modell {
         Cluster(double[] centroid, String assignedClass) {
             this.centroid = centroid;
             this.assignedClass = assignedClass;
+        }
+    }
+
+    private void saveSilhouetteToCSV(double silhouetteCoefficient, String outputPath) {
+        try (FileWriter writer = new FileWriter(outputPath, true)) {
+            writer.write("SilhouetteCoefficient\n");
+            writer.write(silhouetteCoefficient + "\n");
+            System.out.println("Silhouette-Koeffizient erfolgreich in die CSV-Datei geschrieben.");
+        } catch (IOException e) {
+            System.err.println("Fehler beim Schreiben der Silhouette-CSV-Datei: " + e.getMessage());
         }
     }
 }

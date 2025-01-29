@@ -18,8 +18,6 @@ public class MyDataCreator {
 		//loadFilesByFolder("C:\\Verkehrszeichen",3);
 
 		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 4,4);  //Testdaten erstellen - hat funktioniert
-		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 5,5);
-		new MyDataCreator("D:\\1.2_Master\\IdeaProjects\\Verkehrszeichen","src/de/hszg/learner/ergebnisse", 3,3);
 	}
 		//Idee für Eigenen Data Creater, erstellt Daten basierend auf einem Ordner
 	MyDataCreator(String FolderPathnameImages, String FolderPathnameData, int gridCols, int gridRows){

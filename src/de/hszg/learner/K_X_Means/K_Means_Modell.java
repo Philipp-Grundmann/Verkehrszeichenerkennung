@@ -1,8 +1,10 @@
 package de.hszg.learner.K_X_Means;
 import smile.clustering.KMeans;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class K_Means_Modell {
@@ -10,11 +12,13 @@ public class K_Means_Modell {
     private final int numClusters;
     private final int maxIterations;
     private final long randomSeed;
+    private final String silhouetteOutputPath;
 
-    public K_Means_Modell(int numClusters, int maxIterations, long randomSeed) {
+    public K_Means_Modell(int numClusters, int maxIterations, long randomSeed, String silhouetteOutputPath) {
         this.numClusters = numClusters;
         this.maxIterations = maxIterations;
         this.randomSeed = randomSeed;
+        this.silhouetteOutputPath = silhouetteOutputPath;
     }
 
     public List<Cluster> run(List<double[]> trainingSetList, List<String> trafficSignLabels, String outputPath, List<String> testLabels, List<double[]> testData) {
@@ -47,6 +51,8 @@ public class K_Means_Modell {
         // Silhouette-Koeffizient berechnen
         double silhouetteCoefficient = SilhouetteCoefficient.calculateSilhouette(trainingSet, kmeans.y);
         System.out.println("Silhouette-Koeffizient: " + silhouetteCoefficient);
+
+        saveSilhouetteResultsToCSV(silhouetteCoefficient, silhouetteOutputPath);
 
         // Ergebnisse speichern
         saveResultsToCSV(mergedClusters, outputPath);
@@ -203,4 +209,23 @@ public class K_Means_Modell {
             this.assignedClass = assignedClass;
         }
     }
+
+    private void saveSilhouetteResultsToCSV(double silhouetteCoefficient, String outputPath) {
+        try (FileWriter writer = new FileWriter(outputPath, true)) {
+            // Kopfzeile hinzufügen, falls die Datei leer ist
+            File file = new File(outputPath);
+            if (file.length() == 0) {
+                writer.write("Timestamp,SilhouetteCoefficient\n");
+            }
+
+            // Silhouette-Wert mit Zeitstempel speichern
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            writer.write(String.format("%s,%.4f\n", timestamp, silhouetteCoefficient));
+
+            System.out.println("Silhouette-Ergebnisse erfolgreich in die CSV-Datei geschrieben.");
+        } catch (IOException e) {
+            System.err.println("Fehler beim Schreiben der Silhouette-Ergebnisse in die CSV-Datei: " + e.getMessage());
+        }
+    }
+
 }
